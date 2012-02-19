@@ -1,0 +1,13 @@
+# Exported functions
+export(GPvam,print.GPvam,plot.GPvam,summary.GPvam)
+
+# Imported functions
+import(numDeriv)
+import(Matrix)
+
+
+# S3 methods
+S3method(print, GPvam)
+S3method(plot, GPvam)
+S3method(summary, GPvam)
+S3method(print,summary.GPvam)
