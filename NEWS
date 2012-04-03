@@ -1,0 +1,13 @@
+Version 1.0-1: 2012-04-03
+
+	- Corrected issue where program crashed when updated
+          covariance matrix was not symmetric due to rounding
+          (i.e. transposed compoenents may have differered by
+          1E-14 or so).
+        
+        - Added caterpillar plots to plot() output.
+
+
+Version 1.0-0: 2012-02-19
+
+        - First public release.

@@ -85,7 +85,7 @@ An object of class \code{GPvam} is a list containing the following components:
 The function  \code{\link{summary}} provides a summary of the results. This includes the estimated model parameters and standard errors, along with the correlation matrices corresponding to the estimated correlation matrices. Summary information about scaled and raw residuals is reported.
 }
 \references{
-Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation of the Generalized Persistence Value-Added Model.\emph{Submitted.} 
+Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation of the Generalized Persistence Value-Added Model. \emph{Submitted.} 
 
 Mariano, L., McCaffrey, D. and Lockwood, J. (2010) A Model for Teacher Effects From Longitudinal Data Without Assuming Vertical Scaling. \emph{Journal of Educational and Behavioral Statistics} \bold{35}, 
 253--279.
@@ -104,13 +104,15 @@ The model assumes that each teacher teaches only one year. If, for example, a te
 To keep these effects seperate, the progam appends "(year i)" to each teacher name, where i is the year in which the teacher taught.
 
 The \code{fixed_effects} argument of \code{GPvam} utilizes the functionality of R's \code{formula} class. In the statement \code{fixed_effects=formula(~as.factor(year)+cont_var+0))}, \code{as.factor(year)} identifies \code{year} as a categorical variable. \code{+0} indicates that no intercept is to be fitted, and \code{+cont_var} indicates that a seperate effect is to be fitted for the continuous variable "cont_var." An interaction between "year" and "cont_var" could be specified by \code{~as.factor(year)*cont_var+0}, or equivalently, \code{~as.factor(year)+cont_var+as.factor(year):cont_var+0}. See \code{\link{formula}} for more details.
+
+When applied to an object of class GPvam, \code{\link{plot.GPvam}} returns a caterpillar plot for each effect, as well as residual plots.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
- \code{\link{plot}},
- \code{\link{summary}},
+ \code{\link{plot.GPvam}},
+ \code{\link{summary.GPvam}},
  \code{\link{vam_data}}
 }
 \examples{

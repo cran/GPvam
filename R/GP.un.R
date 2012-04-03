@@ -46,7 +46,7 @@ function (Z_mat, fixed_effects, control)
             index <- 1
             for (j in 1:nyear) {
                 ne <- (Kg[j] * (Kg[j] + 1))/2
-                resB <- bdiag(resB, suppressMessages(kronecker(.symDiagonal(nteacher[j]), 
+                resB <- bdiag(resB, suppressMessages(kronecker(suppressMessages(.symDiagonal(nteacher[j])), 
                   ltriangle(G[index:(index + ne - 1)]))))
                 index <- index + ne
             }
@@ -85,14 +85,14 @@ function (Z_mat, fixed_effects, control)
         R_i <- ltriangle(as.vector(thetas[1:n_Rparm]))
         R_i.parm <- as.vector(thetas[1:n_Rparm])
         if (length(mis.list) > 0) {
-            R <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
+            R <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
                 R_i)[-mis.list, -mis.list]))
             R_inv <- solve(R)
         }
         else {
-            R <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
+            R <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
                 R_i)))
-            R_inv <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
+            R_inv <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
                 chol2inv(chol(R_i)))))
         }
         new.eta <- update.eta(X = X, Y = Y, Z = Z, 
@@ -342,14 +342,14 @@ function (Z_mat, fixed_effects, control)
     }
     R_i <- diag(R.temp.comp)
     if (length(mis.list) > 0) {
-        R <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
+        R <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
             R_i)[-mis.list, -mis.list]))
         R_inv <- solve(R)
     }
     else {
-        R <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
+        R <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
             R_i)))
-        R_inv <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
+        R_inv <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
             chol2inv(chol(R_i)))))
     }
     
@@ -368,7 +368,7 @@ function (Z_mat, fixed_effects, control)
     flush.console()
     for (it in 1:iter) {
         ptm <- proc.time()[3]
-        rm(var.eta.hat)
+        suppressWarnings(rm(var.eta.hat,temp_mat))
         new.eta <- update.eta(X = X, Y = Y, Z = Z, 
             R_inv = R_inv, ybetas = ybetas, G = G, nyear = nyear, 
             cons.logLik = cons.logLik, Ny = Ny, nstudent = nstudent, 
@@ -479,13 +479,13 @@ function (Z_mat, fixed_effects, control)
                 index2 <- index2 + Kg[j]
             }
             index1 <- index1 + nteacher[j] * Kg[j]
-            gam_t[[j]] <- as(gam_t[[j]]/nteacher[j], "sparseMatrix")
+            gam_t[[j]] <- suppressMessages(as(suppressMessages(symmpart(gam_t[[j]]/nteacher[j])), "sparseMatrix"))
         }
         rm(j, k, index2, index1)
         ybetasn <- numeric(n_ybeta)
         Gn <- Matrix(0, 0, 0)
         for (j in 1:nyear) {
-            Gn <- bdiag(Gn, suppressMessages(kronecker(.symDiagonal(nteacher[j]), 
+            Gn <- bdiag(Gn, suppressMessages(kronecker(suppressMessages(.symDiagonal(nteacher[j])), 
                 gam_t[[j]])))
         }
         rm(j)
@@ -563,7 +563,6 @@ if(hes.count==29) R.cc<-0
             R_inv <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
                 solve(R_i))))
         }
-        rm(temp_mat)
         ybetas <- ybetasn
         G <- Gn
     if (control$verbose)    cat("Iteration Time: ", proc.time()[3] - ptm, " seconds\n")

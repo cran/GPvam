@@ -53,8 +53,8 @@ function (Z_mat, fixed_effects, control)
               index <- c(2)
               for (j in 1:nyear) {
                   ne <- (Kg[j] * (Kg[j] + 1))/2
-                  resB <- bdiag(resB, kronecker(.symDiagonal(nteacher[j]), 
-                    ltriangle(G[index:(index + ne - 1)])))
+                  resB <- suppressMessages(bdiag(resB, suppressMessages(kronecker(suppressMessages(.symDiagonal(nteacher[j])), 
+                    ltriangle(G[index:(index + ne - 1)])))))
                   index <- index + ne
               }
               rm(j)
@@ -404,15 +404,15 @@ function (Z_mat, fixed_effects, control)
                   index2 <- index2 + Kg[j]
               }
               index1 <- index1 + nteacher[j] * Kg[j]
-              gam_t[[j]] <- as(gam_t[[j]]/nteacher[j], "sparseMatrix")
+              gam_t[[j]] <- suppressMessages(as(symmpart(suppressMessages(gam_t[[j]]/nteacher[j])), "sparseMatrix"))
           }
           rm(j, k, index2, index1)
           rm(temp_mat)
           ybetasn <- numeric(n_ybeta)
           Gn <- gam_stu * Diagonal(nstudent)
           for (j in 1:nyear) {
-              Gn <- bdiag(Gn, kronecker(.symDiagonal(nteacher[j]), 
-                  gam_t[[j]]))
+              Gn <- suppressMessages(bdiag(Gn, suppressMessages(kronecker(suppressMessages(.symDiagonal(nteacher[j])), 
+                  gam_t[[j]]))))
           }
           rm(j)
           ybetasn <- update.ybeta(X_j = X_j, cross_X_j = cross_X_j, 

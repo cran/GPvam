@@ -2,8 +2,9 @@
 export(GPvam,print.GPvam,plot.GPvam,summary.GPvam)
 
 # Imported functions
-import(numDeriv)
 import(Matrix)
+importFrom(gplots,plotCI)
+importFrom(numDeriv,jacobian)
 
 
 # S3 methods

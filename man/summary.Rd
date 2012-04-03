@@ -32,6 +32,7 @@ Sharon Lohr
  \code{\link{plot.GPvam}}
 }
 \examples{
+data(vam_data)
 result<-GPvam(vam_data)
 summary(result)
 }

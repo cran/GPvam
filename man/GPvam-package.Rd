@@ -11,11 +11,10 @@ An EM algorithm is used to estimate the generalized persistence model
 \tabular{ll}{
 Package: \tab GPvam\cr
 Type: \tab Package\cr
-Version: \tab 1.0-0\cr
-Date: \tab 2012-02-19\cr
+Version: \tab 1.1-0\cr
+Date: \tab 2012-04-03\cr
 License: \tab GPL-2\cr
 }
-how to use package
 }
 \author{
 Andrew Karl, Yan Yang, and Sharon Lohr
@@ -23,7 +22,7 @@ Andrew Karl, Yan Yang, and Sharon Lohr
 Maintainer: Andrew Karl <akarl@asu.edu>
 }
 \references{
-Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation of the Generalized Persistence Value-Added Model.\emph{Submitted.} 
+Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation of the Generalized Persistence Value-Added Model. \emph{Submitted.} 
 
 Mariano, L., McCaffrey, D. and Lockwood, J. (2010) A Model for Teacher Effects From Longitudinal Data Without Assuming Vertical Scaling. \emph{Journal of Educational and Behavioral Statistics} \bold{35}, 
 253--279.
@@ -32,6 +31,7 @@ McCaffrey, D. and Lockwood, J. (2011) Missing Data in Value-Added Modeling of Te
 }
 
 \examples{
+data(vam_data)
 result<-GPvam(vam_data)
 summary(result)
 \dontrun{
