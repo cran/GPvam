@@ -28,7 +28,7 @@ the significance level for the caterpillar plots
 Requires user to click window or press "enter" to progress through plots. Returns caterpillar plots (via the package gplots) and residual plots. 
 }
 \references{
-Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation of the Generalized Persistence Value-Added Model. \emph{Submitted.} 
+Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation for Multiple Membership Mixed Models Used in Value-Added Modeling. \emph{Submitted.} 
 
 Mariano, L., McCaffrey, D. and Lockwood, J. (2010) A Model for Teacher Effects From Longitudinal Data Without Assuming Vertical Scaling. \emph{Journal of Educational and Behavioral Statistics} \bold{35}, 
 253--279.
@@ -46,9 +46,9 @@ Sharon Lohr
  \code{\link{summary.GPvam}}
 }
 \examples{
+\dontrun{
 data(vam_data)
 result<-GPvam(vam_data)
-\dontrun{
 plot(result)
 }
 }

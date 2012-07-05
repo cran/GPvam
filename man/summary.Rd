@@ -32,8 +32,10 @@ Sharon Lohr
  \code{\link{plot.GPvam}}
 }
 \examples{
+\dontrun{
 data(vam_data)
 result<-GPvam(vam_data)
 summary(result)
+}
 }
 \keyword{ regression }

@@ -1,4 +1,4 @@
-GP.un <-                                            
+rGP.un <-                                            
 function (Z_mat, fixed_effects, control) 
 {
     gr.eta <- function(eta, X, Y, Z, ybetas, R_inv, G.inv) {
@@ -229,7 +229,7 @@ function (Z_mat, fixed_effects, control)
     }
     rm(j)
     RE_s_start_pos <- 1
-    Kg <- nyear - 1:nyear + 1
+    Kg <- c(rep(2,nyear-1),1)
     Z_mat <- Z_mat[order(Z_mat$year, Z_mat$teacher), ]
     Z_mat.full <- Z_mat.full[order(Z_mat.full$year, Z_mat.full$teacher), 
         ]
@@ -240,8 +240,9 @@ function (Z_mat, fixed_effects, control)
     }else {
         teachyearcomb <- unique(cBind(Z_mat$year, Z_mat$teacher))
     }
-    nteach_effects <- sum(nyear - as.numeric(teachyearcomb[, 
-        1]) + 1)
+        nteacher <- as.vector(tapply(teachyearcomb[, 2], teachyearcomb[, 
+        1], length))
+    nteach_effects <- sum(nteacher*c(rep(2,nyear-1),1))
     teacheffZ_mat <- Matrix(0, nrow = nrow(Z_mat), ncol = nteach_effects)
     t_effects <- rep(NA, nteach_effects)
     indx <- 1
@@ -256,19 +257,26 @@ function (Z_mat, fixed_effects, control)
                 teacheffZ_mat[is.element(Z_mat$student, student_subset) & 
                   Z_mat$year == yr & !is.na(Z_mat$y), indx] <- 1
             }
-            t_effects[indx] <- paste(teachyearcomb[k, 1], "_", 
-                teachyearcomb[k, 2], "_", yr, sep = "")
-            indx <- indx + 1
-            eblup.tracker <- rBind(eblup.tracker, c(teachyearcomb[k, 
+            if (yr==as.numeric(teachyearcomb[k,1])){
+             t_effects[indx] <- paste(teachyearcomb[k, 1], "_", 
+                teachyearcomb[k, 2], "_current", sep = "")
+                            eblup.tracker <- rBind(eblup.tracker, c(teachyearcomb[k, 
                 ], yr))
+                }
+            if (yr==(as.numeric(teachyearcomb[k,1])+1)){
+             t_effects[indx] <- paste(teachyearcomb[k, 1], "_", 
+                teachyearcomb[k, 2], "_future", sep = "")
+                   eblup.tracker <- rBind(eblup.tracker,c(teachyearcomb[k, 
+                ], yr))
+                }
+            if (yr==(as.numeric(teachyearcomb[k,1]))|yr==nyear) indx <- indx + 1
+
         }
     }
     rm(k, yr, indx)
     Z_mat.full <- Z_mat.full[order(Z_mat.full$student, Z_mat.full$year, 
         Z_mat.full$teacher), , drop = FALSE]
     mis.list <- which(Z_mat.full$mis == 1)
-    nteacher <- as.vector(tapply(teachyearcomb[, 2], teachyearcomb[, 
-        1], length))
     colnames(teacheffZ_mat) <- t_effects
     RE_mat <- teacheffZ_mat
     X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
@@ -277,7 +285,7 @@ function (Z_mat, fixed_effects, control)
         cat("WARNING: Fixed-effects design matrix not full-rank", 
             "\n")
         flush.console()
-        break
+        break                      
     }
     RE_mat <- RE_mat[order(Z_mat$student, Z_mat$year, Z_mat$teacher), 
         , drop = FALSE]
@@ -303,7 +311,6 @@ function (Z_mat, fixed_effects, control)
     Z_mat.full$pat <- rep(apply(pattern.student, 1, bin2dec), 
         each = nyear)
     Z_mat$pat <- Z_mat.full[Z_mat.full$r == 1, ]$pat
-    rm(Z_mat.full)
     pat <- list()
     pattern.count <- list()
     pattern.length <- list()
@@ -311,7 +318,7 @@ function (Z_mat, fixed_effects, control)
     Y.p <- list()
     Z.p <- list()
     pattern.key <- dec2bin(1:(2^nyear - 1))
-    for (p in unique(Z_mat$pat)) {
+   for (p in unique(Z_mat$pat)) {
         pat[[p]] <- which(Z_mat$pat == p)
         if(!huge.flag){
         X.p[[p]] <- X.dense[pat[[p]], , drop = FALSE]     
@@ -353,8 +360,7 @@ function (Z_mat, fixed_effects, control)
         R <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
             R_i)[-mis.list, -mis.list]))
         R_inv <- solve(R)
-    }
-    else {
+    }else {
         R <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
             R_i)))
         R_inv <- symmpart(suppressMessages(kronecker(suppressMessages(Diagonal(nstudent)), 
@@ -499,7 +505,7 @@ function (Z_mat, fixed_effects, control)
         rm(j)
         ybetasn <- update.ybeta(X, Y, Z, R_inv, eta.hat)
         pattern.sum <- list()
-        for (p in unique(Z_mat$pat)) {
+for (p in unique(Z_mat$pat)) {
             pattern.sum[[p]] <- matrix(0, pattern.length[[p]], 
                 pattern.length[[p]])
             for (i in 1:(pattern.count[[p]]/pattern.length[[p]])) {
@@ -569,8 +575,7 @@ if(hes.count==29) R.cc<-0
             R <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
                 R_i))[-mis.list, -mis.list])
             R_inv <- suppressMessages(solve(R))
-        }
-        else {
+        }else {
             R <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
                 R_i)))
             R_inv <- symmpart(suppressMessages(kronecker(Diagonal(nstudent), 
@@ -592,7 +597,7 @@ if(hes.count==29) R.cc<-0
      if (control$verbose)   cat("Calculating Hessian of the variance components...")
         flush.console()
         pattern.sum <- list()
-        for (p in unique(Z_mat$pat)) {
+      for (p in unique(Z_mat$pat)) {
             pattern.sum[[p]] <- matrix(0, pattern.length[[p]], 
                 pattern.length[[p]])
             for (i in 1:(pattern.count[[p]]/pattern.length[[p]])) {
@@ -678,7 +683,7 @@ if(hes.count==29) R.cc<-0
         x <- c(NULL)
         for (k in 1:Kg[j]) {
             x <- c(x, k:Kg[j])
-            y <- c(y, rep(k, (Kg[j] - k + 1)))
+            y <- c(y, rep(k, (Kg[j] - k + 1)))  
         }
         t_lab <- c(t_lab, paste("teacher effect from year", rep(j, 
             ne), ":[", x, ",", y, "]", sep = ""))
@@ -714,11 +719,15 @@ if(hes.count==29) R.cc<-0
     yhat.m <- as.numeric(X %*% ybetas)
     Hessian <- round(Hessian, 5)
     R_i <- round(R_i, 4)
-    for (i in 1:nyear) {
+    for (i in 1:(nyear-1)) {
         gam_t[[i]] <- round(as.matrix(gam_t[[i]]), 4)
-        colnames(gam_t[[i]]) <- paste("year", control$key[i:nyear,1], sep = "")
+        colnames(gam_t[[i]]) <- c("current","future")
         rownames(gam_t[[i]]) <- colnames(gam_t[[i]])
     }
+    i<-nyear
+            gam_t[[i]] <- round(as.matrix(gam_t[[i]]), 4)
+        colnames(gam_t[[i]]) <- c("current")
+        rownames(gam_t[[i]]) <- colnames(gam_t[[i]])
     rchol <- try(chol(R_inv))
     yhat.s <- try(as.vector(rchol %*% (yhat)))
     sresid <- try(as.vector(rchol %*% Y - yhat.s))

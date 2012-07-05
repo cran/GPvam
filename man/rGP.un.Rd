@@ -1,21 +1,21 @@
-\name{GP.csh}
-\alias{GP.csh}
+\name{rGP.un}
+\alias{rGP.un}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Internal G-side effects function
+Internal R-side effects function for reduced GP model
 }
 \description{
 An internal function
 }
 \usage{
-GP.csh(Z_mat, fixed_effects, control)
+rGP.un(Z_mat, fixed_effects, control)
 }
 \arguments{
   \item{Z_mat}{
 data frame
 }
   \item{fixed_effects}{
-formula specifying fixed effects to be included in model
+formla specifying fixed effects to be included in model
 }
 \item{control}{
 a list

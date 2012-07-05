@@ -1,14 +1,14 @@
-\name{GP.csh}
-\alias{GP.csh}
+\name{VP.CP.ZP.un}
+\alias{VP.CP.ZP.un}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Internal G-side effects function
+Internal R-side effects function for the variable persistence model.
 }
 \description{
 An internal function
 }
 \usage{
-GP.csh(Z_mat, fixed_effects, control)
+VP.CP.ZP.un(Z_mat, fixed_effects, control)
 }
 \arguments{
   \item{Z_mat}{

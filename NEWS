@@ -1,4 +1,17 @@
-Version 1.0-1: 2012-04-03
+Version 2.0-0: 2012-07-05
+	
+	- Improved scalability of program when student.side=”R”. 
+	  For smaller data sets, certain operations work faster 
+	  with dense matrices, but these matrices grow in size 
+	  with the data. For large data sets, we now rely 
+	  exclusively on sparse matrices.
+
+	- Added support for the variable persistence (VP) model,
+	  including the ability to estimate the persistence 
+	  parameters. As special cases, the complete and zero 
+	  persistence models have also been included.
+
+Version 1.1-0: 2012-04-03
 
 	- Corrected issue where program crashed when updated
           covariance matrix was not symmetric due to rounding

@@ -2,14 +2,15 @@
 \alias{GPvam}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Fitting the Generalized Persistence Model
+Fitting the Generalized and Variable Persistence Models
 }
 \description{
-GPvam is used to fit the value-added model developed by Mariano et al. (2010) via ML estimation using an EM algorithm (Karl et al. 2012).
+GPvam is used to fit the value-added model developed by Mariano et al. (2010) via ML estimation using an EM algorithm (Karl et al. 2012). Also provides the ability to fit the 
+variable persistence model (Lockwood et al. 2007).
 }
 \usage{
 GPvam(vam_data, fixed_effects = formula(~as.factor(year) + 0), 
-   student.side = "R", max.iter.EM = 1000, tol1 = 1e-07, 
+   student.side = "R", persistence="GP", max.iter.EM = 1000, tol1 = 1e-07, 
    hessian = TRUE, hes.method = "simple", verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -26,6 +27,10 @@ should be wrapped in an \code{as.factor} statement.
 }
   \item{student.side}{
 a character. Choices are "G" or "R". See section 'Details'.
+}
+  \item{persistence}{
+a character. Choices are "GP", "rGP", "VP", "CP", or "ZP". Only "GP" is currently 
+compatible with student.side="G". See section 'Details'.
 }
 
 
@@ -56,13 +61,15 @@ random student effects. This is similar to the model used by McCaffrey and Lockw
 scale is the same across years. In this case, the error covariance matrix is diagonal, although a separate variance is calcualted for each year.
 From a computational perspective, the model estimating the R-side student effects has better scalability properties, although the G-side function is faster (Karl et al. 2012).
 
+The \code{persistence} option determines the type of persistence effects that are modeled. The generalized persistence model ("GP") is described above. When \code{student.side="R"}, other models for teacher persistence are available. The reduced GP model  ("rGP", Karl et al. 2012) combines each teacher's future year effects from the GP model into a single effect. The variable persistence model ("VP") assumes that teacher effects in future years are multiples of their effect in the current year (Lockwood et al. 2007). The multipliers in the VP model are called persistence parameters, and are estimated. By contrast, the complete ("CP") and zero ("ZP") persistence models fix the persistence parameters at 1 and 0, respectively (Lockwood et al. 2007). 
+
 Convergence is declared when \eqn{(l_k-l_{k-1})/l_k < 1E-07}, where \eqn{l_k} is the log-likelihood 
 at iteration \eqn{k}.
 
 
 The model is estimated via an EM algorithm. For details, see Karl et al. (2012). The model was estimated through Bayesian computation in Mariano et al. (2010).
 
-Note: When student.side="R" is selected, the first two iterations of the EM algorithm will take longer than subsequent iterations. This is a result of the hybrid gradient-ascent/Newton-Raphson method used in the M-step for the R matrix in the first two iterations (Karl et al. 2012).
+Note: When student.side="R" is selected, the first few iterations of the EM algorithm will take longer than subsequent iterations. This is a result of the hybrid gradient-ascent/Newton-Raphson method used in the M-step for the R matrix in the first two iterations (Karl et al. 2012).
 }
 \value{
 GPvam returns an object of class \code{GPvam}
@@ -85,7 +92,9 @@ An object of class \code{GPvam} is a list containing the following components:
 The function  \code{\link{summary}} provides a summary of the results. This includes the estimated model parameters and standard errors, along with the correlation matrices corresponding to the estimated correlation matrices. Summary information about scaled and raw residuals is reported.
 }
 \references{
-Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation of the Generalized Persistence Value-Added Model. \emph{Submitted.} 
+Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation for Multiple Membership Mixed Models Used in Value-Added Modeling. \emph{Submitted.} 
+
+Lockwood, J., McCaffrey, D., Mariano, L., Setodji, C. (2007) Bayesian Methods for Scalable Multivariate Value-Added Assesment. \emph{Journal of Educational and Behavioral Statistics} \bold{32}, 125--150.
 
 Mariano, L., McCaffrey, D. and Lockwood, J. (2010) A Model for Teacher Effects From Longitudinal Data Without Assuming Vertical Scaling. \emph{Journal of Educational and Behavioral Statistics} \bold{35}, 
 253--279.
@@ -117,7 +126,7 @@ When applied to an object of class GPvam, \code{\link{plot.GPvam}} returns a cat
 }
 \examples{
 data(vam_data)
- result <- GPvam(vam_data,student.side="G",
+ result <- GPvam(vam_data,student.side="R",persistence="VP",
 fixed_effects=formula(~as.factor(year)+cont_var+0))
  summary(result)
 \dontrun{

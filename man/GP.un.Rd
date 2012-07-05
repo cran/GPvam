@@ -15,7 +15,7 @@ GP.un(Z_mat, fixed_effects, control)
 data frame
 }
   \item{fixed_effects}{
-formual specifying fixed effects to be included in model
+formula specifying fixed effects to be included in model
 }
 \item{control}{
 a list

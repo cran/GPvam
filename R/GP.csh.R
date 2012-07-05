@@ -528,5 +528,5 @@ function (Z_mat, fixed_effects, control)
         cresid = cresid, y = Y, yhat = yhat, stu.cov = gam_stu, 
         num.obs = Ny, num.student = nstudent, num.year = nyear, 
         num.teach = nteacher, yhat.m = yhat.m, sresid = sresid, 
-        yhat.s = yhat.s,iter=it)
+        yhat.s = yhat.s,iter=it,persistence=control$persistence)
 }

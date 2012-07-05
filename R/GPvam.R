@@ -1,13 +1,23 @@
 GPvam <-
 function (vam_data, fixed_effects = formula(~as.factor(year) + 
-    0), student.side = "R", max.iter.EM = 1000, 
+    0), student.side = "R", persistence="GP", max.iter.EM = 1000, 
     tol1 = 1e-07, hessian = TRUE, hes.method = "simple", verbose = FALSE) 
 {
-    control<-list(max.iter.EM=max.iter.EM,tol1=tol1,hessian=hessian,hes.method=hes.method,verbose=verbose)
+    control<-list(max.iter.EM=max.iter.EM,tol1=tol1,hessian=hessian,hes.method=hes.method,verbose=verbose,persistence=persistence)
     Z_mat <- vam_data
     if (class(try(na.fail(Z_mat[, !(names(Z_mat) %in% c("teacher", 
         "y"))]), silent = TRUE)) == "try-error") {
         cat("*Error: NA values present.\n*NA values are allowed for the 'teacher; and 'y' variables, but no others.\n*Please remove these observations from your data frame.\n")
+        flush.console()
+        return(0)
+    }
+    if (student.side == "G" & persistence!="GP") {
+    cat("*Error: student.side=\"G\" may only be paired with persistence=\"GP\"")
+        flush.console()
+        return(0)
+    }
+    if (class("student.side")!="character"|class("persistence")!="character") {
+    cat("*Error: student.side and persistence must be characters (using quotation marks)")
         flush.console()
         return(0)
     }
@@ -26,14 +36,20 @@ function (vam_data, fixed_effects = formula(~as.factor(year) +
         Z_mat[Z_mat$year == levels(Z_mat$year)[j], ]$teacher <- paste(Z_mat[Z_mat$year == 
             levels(Z_mat$year)[j], ]$teacher, "(year", levels(Z_mat$year)[j], ")", sep = "")
     }
-    if (student.side == "R") {
+    if (student.side == "R" & persistence=="GP") {
         res <- GP.un(Z_mat, fixed_effects, control)
     }
-    else if (student.side == "G") {
+    else if (student.side == "G"& persistence=="GP") {
         res <- GP.csh(Z_mat, fixed_effects, control)
-    }
+    } 
+    else if (student.side == "R"& persistence=="rGP") {
+        res <- rGP.un(Z_mat, fixed_effects, control)
+    } 
+    else if (student.side == "R"& (persistence=="VP"|persistence=="CP"|persistence=="ZP")) {
+        res <- VP.CP.ZP.un(Z_mat, fixed_effects, control)
+    } 
     else {
-        cat("Error in specification of student.side\n")
+        cat("Error in specification of student.side or persistence\n")
         return(0)
     }
     #res$teach.effects$year
