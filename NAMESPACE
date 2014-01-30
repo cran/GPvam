@@ -1,9 +1,12 @@
+useDynLib(GPvam)
 # Exported functions
 export(GPvam,print.GPvam,plot.GPvam,summary.GPvam)
 
 # Imported functions
 import(Matrix)
-importFrom(gplots,plotCI)
+import(Rcpp)
+import(RcppArmadillo)
+#importFrom(gplots,plotCI)
 importFrom(numDeriv,jacobian)
 
 

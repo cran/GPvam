@@ -5,7 +5,7 @@
 Fitting the Generalized and Variable Persistence Models
 }
 \description{
-GPvam is used to fit the value-added model developed by Mariano et al. (2010) via ML estimation using an EM algorithm (Karl et al. 2012). Also provides the ability to fit the 
+GPvam is used to fit the value-added model developed by Mariano et al. (2010) via ML estimation using an EM algorithm (Karl et al. 2013). Also provides the ability to fit the 
 variable persistence model (Lockwood et al. 2007).
 }
 \usage{
@@ -92,7 +92,11 @@ An object of class \code{GPvam} is a list containing the following components:
 The function  \code{\link{summary}} provides a summary of the results. This includes the estimated model parameters and standard errors, along with the correlation matrices corresponding to the estimated correlation matrices. Summary information about scaled and raw residuals is reported.
 }
 \references{
-Karl, A., Yang, Y. and Lohr, S. (2012) Efficient Maximum Likelihood Estimation for Multiple Membership Mixed Models Used in Value-Added Modeling. \emph{Submitted.} 
+Karl, A., Yang, Y. and Lohr, S. (2013) Efficient Maximum Likelihood Estimation of Multiple Membership Linear Mixed Models, with an Application to Educational Value-Added Assessments \emph{Computational Statistics & Data Analysis} \bold{59}, 13--27.  
+
+Karl, A., Yang, Y. and Lohr, S. (2014) Computation of Maximum Likelihood Estimates for Multiresponse Generalized Linear Mixed Models with Non-nested, Correlated Random Effects \emph{Computational Statistics & Data Analysis} \bold{73}, 146--162.
+
+Karl, A., Yang, Y. and Lohr, S. (2014) A Correlated Random Effects Model for Nonignorable Missing Data in Value-Added Assessment of Teacher Effects \emph{Journal of Educational and Behavioral Statistics} \bold{38}, 577--603.
 
 Lockwood, J., McCaffrey, D., Mariano, L., Setodji, C. (2007) Bayesian Methods for Scalable Multivariate Value-Added Assesment. \emph{Journal of Educational and Behavioral Statistics} \bold{32}, 125--150.
 
@@ -125,11 +129,13 @@ When applied to an object of class GPvam, \code{\link{plot.GPvam}} returns a cat
  \code{\link{vam_data}}
 }
 \examples{
+\dontrun{
+#Not run
 data(vam_data)
  result <- GPvam(vam_data,student.side="R",persistence="VP",
-fixed_effects=formula(~as.factor(year)+cont_var+0))
+fixed_effects=formula(~as.factor(year)+cont_var+0),verbose=TRUE)
  summary(result)
-\dontrun{
+
  plot(result)
 }
 }

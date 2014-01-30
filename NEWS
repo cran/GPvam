@@ -1,6 +1,14 @@
+Version 3.0-0: 2014-01-30
+	
+	- The program runs much faster now with student.side="R"
+	  due to the use of Rcpp and RcppArmadillo.
+
+	- Added references to recently accepted papers in
+          help files.
+
 Version 2.0-0: 2012-07-05
 	
-	- Improved scalability of program when student.side=”R”. 
+	- Improved scalability of program when student.side="R". 
 	  For smaller data sets, certain operations work faster 
 	  with dense matrices, but these matrices grow in size 
 	  with the data. For large data sets, we now rely 
