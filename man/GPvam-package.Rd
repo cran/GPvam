@@ -11,8 +11,8 @@ An EM algorithm (Karl et al. 2013) is used to estimate the generalized and varia
 \tabular{ll}{
 Package: \tab GPvam\cr
 Type: \tab Package\cr
-Version: \tab 3.0-0\cr
-Date: \tab 2014-01-30\cr
+Version: \tab 3.0-1\cr
+Date: \tab 2014-01-31\cr
 License: \tab GPL-2\cr
 }
 }

@@ -286,10 +286,7 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
     X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
     X_mat <- X_mat[, !(colSums(abs(X_mat)) == 0), drop = FALSE]
     if (rankMatrix(X_mat)[1] != dim(X_mat)[2]) {
-        cat("WARNING: Fixed-effects design matrix not full-rank", 
-            "\n")
-        flush.console()
-        break
+        stop("WARNING: Fixed-effects design matrix not full-rank")
     }
     RE_mat <- RE_mat[order(Z_mat$student, Z_mat$year, Z_mat$teacher), 
         , drop = FALSE]

@@ -102,6 +102,15 @@ function (Z_mat, fixed_effects, control)
         eta.hat <- attr(new.eta, "eta")
         var.eta.hat <- new.eta
         temp_mat <- var.eta.hat + tcrossprod(eta.hat, eta.hat)
+                        pattern.sum <- list()
+for (p in unique(Z_mat$pat)) {
+pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]]),loopsize_=pattern.count[[p]]/pattern.length[[p]],
+  patternlength_=pattern.length[[p]],rownumber_=as.matrix(Y.p.rownumber[[p]]),ybetas_=as.matrix(ybetas),
+  etahat_=as.matrix(eta.hat),tempmatR_=as.matrix(temp_mat),
+  JXpi_=as.matrix(X.p[[p]]@i),JXpp_=as.matrix(X.p[[p]]@p),JXpx_=as.matrix(X.p[[p]]@x),JXpdim_=as.matrix(X.p[[p]]@Dim),
+  JZpi_=as.matrix(Z.p[[p]]@i),JZpp_=as.matrix(Z.p[[p]]@p),JZpx_=as.matrix(Z.p[[p]]@x),JZpdim_=as.matrix(Z.p[[p]]@Dim))
+}  
+ 
         score.R <- -pattern.f.score(R_i.parm, nyear, pattern.parmlist2, 
             pattern.count, pattern.length, pattern.Rtemplate, 
             pattern.diag, pattern.key, pattern.sum)
@@ -170,27 +179,28 @@ function (Z_mat, fixed_effects, control)
             res[1, ]
         else res
     }
-    pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, 
-        pattern.count, pattern.length, pattern.Rtemplate, pattern.diag, 
-        pattern.key, pattern.sum) {
-        R_i <- ltriangle(as.vector(R_i.parm))
-        pattern.score <- numeric(nyear/2 * (nyear + 1))
+   R_mstep2 <- function(invsqrtW_,JYp_,loopsize_, patternlength_,rownumber_,ybetas_,etahat_,tempmatR_,JXpi_,JXpp_,JXpx_,JXpdim_,JZpi_,JZpp_,JZpx_,JZpdim_){
+.Call( "R_mstep_cpp",invsqrtW_,JYp_,loopsize_, patternlength_,rownumber_,ybetas_,etahat_,tempmatR_,JXpi_,JXpp_,JXpx_,JXpdim_,JZpi_,JZpp_,JZpx_,JZpdim_)
+}
+
+pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, pattern.length, pattern.Rtemplate, pattern.diag, pattern.key, pattern.sum) {
+     R_i <- as.matrix(ltriangle(as.vector(R_i.parm)))
+    pattern.score <- numeric(nyear/2 * (nyear + 1) )
+    for (p in nonempty.patterns) {
+    pattern.y <- solve(pattern.f.R(R_i, p, nyear, pattern.key))
+    YSY<-pattern.y %*% pattern.sum[[p]] %*% pattern.y
+    PCL<-pattern.countoverlength[[p]]
         for (r.parm in 1:(nyear/2 * (nyear + 1))) {
-            for (p in pattern.parmlist2[[r.parm]]) {
-                pat.coord <- which(tril(pattern.f.R(pattern.Rtemplate, 
-                  p, nyear, pattern.key)) == r.parm)
-                pattern.y <- solve(pattern.f.R(R_i, p, nyear, 
-                  pattern.key))
-                pattern.yc <- pattern.y[pat.coord]
-                pattern.score[r.parm] <- pattern.score[r.parm] - 
-                  (pattern.count[[p]]/pattern.length[[p]] * pattern.yc - 
-                    (pattern.y %*% pattern.sum[[p]] %*% pattern.y)[pat.coord])
-            }
-            if (r.parm %in% pattern.diag) 
-                pattern.score[r.parm] <- 0.5 * pattern.score[r.parm]
+            if(is.null(pat.coord <- pat.coord.guide[[r.parm]][[p]])) next
+            pattern.yc <- pattern.y[pat.coord]
+            pattern.score[r.parm] <- pattern.score[r.parm] - ( PCL* pattern.yc - YSY[pat.coord])
+
         }
-        -pattern.score
+
     }
+    pattern.score[1:(nyear/2 * (nyear + 1) ) %in% pattern.diag] <- 0.5 * pattern.score[1:(nyear/2 * (nyear + 1) ) %in% pattern.diag]
+    -pattern.score
+}
     pattern.f.R <- function(R, p, nyear, pattern.key) {
         R[pattern.key[p, ] * (1:nyear), pattern.key[p, ] * (1:nyear), 
             drop = FALSE]
@@ -282,10 +292,9 @@ function (Z_mat, fixed_effects, control)
     X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
     X_mat <- X_mat[, !(colSums(abs(X_mat)) == 0), drop = FALSE]
     if (rankMatrix(X_mat)[1] != dim(X_mat)[2]) {
-        cat("WARNING: Fixed-effects design matrix not full-rank", 
-            "\n")
-        flush.console()
-        break                      
+        stop("WARNING: Fixed-effects design matrix not full-rank")
+
+                              
     }
     RE_mat <- RE_mat[order(Z_mat$student, Z_mat$year, Z_mat$teacher), 
         , drop = FALSE]
@@ -298,7 +307,7 @@ function (Z_mat, fixed_effects, control)
     n_eta <- nteach_effects
     n_ybeta <- dim(X_mat)[2]
     Z <- Matrix(RE_mat)
-    huge.flag<-prod(dim(Z))>1e8
+    huge.flag<-TRUE
     Y <- as.vector(Z_mat$y)
     X <- Matrix(X_mat)
     if(!huge.flag){
@@ -317,7 +326,11 @@ function (Z_mat, fixed_effects, control)
     X.p <- list()
     Y.p <- list()
     Z.p <- list()
+        Y.p.rownumber <- list()
+    pattern.countoverlength<-list()
+    rownumber <- 1:Ny
     pattern.key <- dec2bin(1:(2^nyear - 1))
+        X<-as(X,"sparseMatrix")
    for (p in unique(Z_mat$pat)) {
         pat[[p]] <- which(Z_mat$pat == p)
         if(!huge.flag){
@@ -328,8 +341,10 @@ function (Z_mat, fixed_effects, control)
         Z.p[[p]] <- Z[pat[[p]], , drop = FALSE]
         }
         Y.p[[p]] <- Y[pat[[p]]]
+        Y.p.rownumber[[p]] <- rownumber[pat[[p]]]
         pattern.count[[p]] <- length(Y.p[[p]])
         pattern.length[[p]] <- sum(pattern.key[p, ])
+        pattern.countoverlength[[p]]<-pattern.count[[p]]/pattern.length[[p]]
     }
     rm(Z.dense, X.dense)
     pattern.yguide <- list()
@@ -367,6 +382,19 @@ function (Z_mat, fixed_effects, control)
             chol2inv(chol(R_i)))))
     }
     
+      pat.coord.guide<-list()
+for (r.parm in 1:(nyear/2 * (nyear + 1) )) {
+pat.coord.guide[[r.parm]]<-list()
+        for (p in pattern.parmlist2[[r.parm]]) {
+            pat.coord.guide[[r.parm]][[p]] <- which(tril(pattern.f.R(pattern.Rtemplate, p, nyear, pattern.key)) == r.parm)
+
+         }
+}
+    nonempty.patterns<-NULL
+for(p in 1:length(pat.coord.guide[[1]])){
+if(is.null(retrieve.parm<-pattern.parmlist1[[p]])) next
+nonempty.patterns<-c(nonempty.patterns,p)
+}
     ybetas <- update.ybeta(X, Y, Z, R_inv, eta.hat)
     names(ybetas) <- colnames(X_mat)
     G <- 100*.symDiagonal(n_eta)
@@ -504,35 +532,14 @@ function (Z_mat, fixed_effects, control)
         }
         rm(j)
         ybetasn <- update.ybeta(X, Y, Z, R_inv, eta.hat)
-        pattern.sum <- list()
+                   pattern.sum <- list()
 for (p in unique(Z_mat$pat)) {
-            pattern.sum[[p]] <- matrix(0, pattern.length[[p]], 
-                pattern.length[[p]])
-            for (i in 1:(pattern.count[[p]]/pattern.length[[p]])) {
-                X.t <- X.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]]), , drop = FALSE]
-                Y.t <- Y.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]])]
-                if(!huge.flag){
-                Z.t <- Z.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]]), , drop = FALSE]
-                  }else{
-                Z.t <- as.matrix(Z.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]]), , drop = FALSE])                  
-                  }
-                temp.t <- Y.t - X.t %*% ybetas
-                quickm <- c(NULL)
-                for (a in 1:pattern.length[[p]]) {
-                  for (b in a:pattern.length[[p]]) {
-                    quickm <- c(quickm, sum(temp_mat[Z.t[b, ] * 
-                      1:n_eta, Z.t[a, ] * 1:n_eta]))
-                  }
-                }
-                pattern.sum[[p]] <- pattern.sum[[p]] + tcrossprod(temp.t) - 
-                  tcrossprod(temp.t, Z.t %*% eta.hat) - tcrossprod(Z.t %*% 
-                  eta.hat, temp.t) + as.matrix(ltriangle(quickm))
-            }
-        }
+pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]]),loopsize_=pattern.count[[p]]/pattern.length[[p]],
+  patternlength_=pattern.length[[p]],rownumber_=as.matrix(Y.p.rownumber[[p]]),ybetas_=as.matrix(ybetas),
+  etahat_=as.matrix(eta.hat),tempmatR_=as.matrix(temp_mat),
+  JXpi_=as.matrix(X.p[[p]]@i),JXpp_=as.matrix(X.p[[p]]@p),JXpx_=as.matrix(X.p[[p]]@x),JXpdim_=as.matrix(X.p[[p]]@Dim),
+  JZpi_=as.matrix(Z.p[[p]]@i),JZpp_=as.matrix(Z.p[[p]]@p),JZpx_=as.matrix(Z.p[[p]]@x),JZpdim_=as.matrix(Z.p[[p]]@Dim))
+}  
         R_i.parm <- ltriangle(as.matrix(R_i))
         R.cc <- 1
         hes.count <- 1
@@ -596,35 +603,14 @@ if(hes.count==29) R.cc<-0
     if (control$hessian == TRUE) {
      if (control$verbose)   cat("Calculating Hessian of the variance components...")
         flush.console()
-        pattern.sum <- list()
-      for (p in unique(Z_mat$pat)) {
-            pattern.sum[[p]] <- matrix(0, pattern.length[[p]], 
-                pattern.length[[p]])
-            for (i in 1:(pattern.count[[p]]/pattern.length[[p]])) {
-                X.t <- X.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]]), , drop = FALSE]
-                Y.t <- Y.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]])]
-                if(!huge.flag){
-                Z.t <- Z.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]]), , drop = FALSE]
-                  }else{
-                Z.t <- as.matrix(Z.p[[p]][(1 + (i - 1) * pattern.length[[p]]):(i * 
-                  pattern.length[[p]]), , drop = FALSE])                  
-                  }
-                temp.t <- Y.t - X.t %*% ybetas
-                quickm <- c(NULL)
-                for (a in 1:pattern.length[[p]]) {
-                  for (b in a:pattern.length[[p]]) {
-                    quickm <- c(quickm, sum(temp_mat[Z.t[b, ] * 
-                      1:n_eta, Z.t[a, ] * 1:n_eta]))
-                  }
-                }
-                pattern.sum[[p]] <- pattern.sum[[p]] + tcrossprod(temp.t) - 
-                  tcrossprod(temp.t, Z.t %*% eta.hat) - tcrossprod(Z.t %*% 
-                  eta.hat, temp.t) + as.matrix(ltriangle(quickm))
-            }
-        }
+                 pattern.sum <- list()
+for (p in unique(Z_mat$pat)) {
+pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]]),loopsize_=pattern.count[[p]]/pattern.length[[p]],
+  patternlength_=pattern.length[[p]],rownumber_=as.matrix(Y.p.rownumber[[p]]),ybetas_=as.matrix(ybetas),
+  etahat_=as.matrix(eta.hat),tempmatR_=as.matrix(temp_mat),
+  JXpi_=as.matrix(X.p[[p]]@i),JXpp_=as.matrix(X.p[[p]]@p),JXpx_=as.matrix(X.p[[p]]@x),JXpdim_=as.matrix(X.p[[p]]@Dim),
+  JZpi_=as.matrix(Z.p[[p]]@i),JZpp_=as.matrix(Z.p[[p]]@p),JZpx_=as.matrix(Z.p[[p]]@x),JZpdim_=as.matrix(Z.p[[p]]@Dim))
+}  
         if (control$hes.method == "richardson") {
             Hessian <- ltriangle(ltriangle(jacobian(Score, thetas, 
                 eta = eta.hat, ybetas = ybetas, X = X, Y = Y, 

@@ -232,10 +232,8 @@ function (Z_mat, fixed_effects, control)
       X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
       X_mat <- X_mat[, !(colSums(abs(X_mat)) == 0)]
       if (rankMatrix(X_mat)[1] != dim(X_mat)[2]) {
-          cat("WARNING: Fixed-effects design matrix not full-rank", 
-              "\n")
-          flush.console()
-          break
+          stop("WARNING: Fixed-effects design matrix not full-rank")
+
       }
       n_eta <- nstudent + nteach_effects
       n_ybeta <- dim(X_mat)[2]
