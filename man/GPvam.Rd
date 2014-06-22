@@ -11,7 +11,7 @@ variable persistence model (Lockwood et al. 2007).
 \usage{
 GPvam(vam_data, fixed_effects = formula(~as.factor(year) + 0), 
    student.side = "R", persistence="GP", max.iter.EM = 1000, tol1 = 1e-07, 
-   hessian = TRUE, hes.method = "simple", verbose = FALSE)
+   hessian = FALSE, hes.method = "simple", verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,7 +41,7 @@ the maximum number of EM iterations
 convergence tolerance for EM algorithm. The convergence criterion is specified under 'Details'.
 }
   \item{hessian}{
-logical indicating whether the Hessian of the variance parameters should be calculated after convergence of the EM algorithm. Standard errors for the fixed and random effects are calculated by default.
+logical indicating whether the Hessian of the variance parameters (and persistence parameters for persistence="VP") should be calculated after convergence of the EM algorithm. Standard errors for the fixed and EBLUPs are calculated by default.
 }
   \item{hes.method}{
 a character string indicating the method of numerical differentiation used
@@ -70,6 +70,12 @@ at iteration \eqn{k}.
 The model is estimated via an EM algorithm. For details, see Karl et al. (2012). The model was estimated through Bayesian computation in Mariano et al. (2010).
 
 Note: When student.side="R" is selected, the first few iterations of the EM algorithm will take longer than subsequent iterations. This is a result of the hybrid gradient-ascent/Newton-Raphson method used in the M-step for the R matrix in the first two iterations (Karl et al. 2012).
+
+\bold{Program run time and memory requirements:}
+The data file GPvam.benchmark that is included with the package contains runtime and peak memory requirements for different persistence settings, using simulated data sets with different values for number of years, number of teachers per year, and number of students per teacher. These have been multiplied to show the total number of teachers in the data set, as well as the total number of students. With student.side="R", the persistence="GP" model is most sensitive to increases in the size of the data set. With student.side="G", the memory requirements increase exponentially with the number of students and teachers, and that model should not be considered scalable to extremely large data sets.
+
+All of these benchmarks were performed with Hessian=TRUE. Calculation of the Hessian accounts for anywhere from 20\% to 75\% of those run times. Unless the standard errors of the variance components are needed, leaving Hessian=FALSE will lead to a faster run time with smaller memory requirements.
+
 }
 \value{
 GPvam returns an object of class \code{GPvam}

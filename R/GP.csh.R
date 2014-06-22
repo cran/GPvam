@@ -16,7 +16,7 @@ function (Z_mat, fixed_effects, control)
               h.y <- h.y + (1/sigmas[j]^2) * cross_Z_j[[j]]
           }
           rm(j)
-          (h.eta + h.y)
+          forceSymmetric(h.eta + h.y)
       }
       ltriangle <- function(x) {
           if (!is.null(dim(x)[2])) {
@@ -231,7 +231,7 @@ function (Z_mat, fixed_effects, control)
       Sig.mat <- sparse.model.matrix(~as.factor(Z_mat$year) + 0)
       X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
       X_mat <- X_mat[, !(colSums(abs(X_mat)) == 0)]
-      if (rankMatrix(X_mat)[1] != dim(X_mat)[2]) {
+      if (rankMatrix(X_mat,method = 'qrLINPACK')[1] != dim(X_mat)[2]) {
           stop("WARNING: Fixed-effects design matrix not full-rank")
 
       }

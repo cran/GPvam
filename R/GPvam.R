@@ -1,7 +1,7 @@
 GPvam <-
 function (vam_data, fixed_effects = formula(~as.factor(year) + 
     0), student.side = "R", persistence="GP", max.iter.EM = 1000, 
-    tol1 = 1e-07, hessian = TRUE, hes.method = "simple", verbose = FALSE) 
+    tol1 = 1e-07, hessian = FALSE, hes.method = "simple", verbose = TRUE) 
 {
     control<-list(max.iter.EM=max.iter.EM,tol1=tol1,hessian=hessian,hes.method=hes.method,verbose=verbose,persistence=persistence)
     Z_mat <- vam_data

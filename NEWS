@@ -1,11 +1,24 @@
-Version 3.0-01: 2014-01-31
+Version 3.0-2: 2014-06-22
+	
+	- Changed method used to calculate rank of X matrix to 
+	  avoid conversion to a dense matrix.
+
+	- Added information to documentation about program run time.
+
+	- Added data set GPvam.benchmark, which contains program run time
+	  and memory requirements for various simulated data sets.
+
+	- Changed default options to Hessian=FALSE and verbose=TRUE.
+
+Version 3.0-1: 2014-01-31
 	
 	- Corrected use of 'break' reserved word
 
 Version 3.0-0: 2014-01-30
 	
 	- The program runs much faster now with student.side="R"
-	  due to the use of Rcpp and RcppArmadillo.
+	  due to the use of Rcpp and RcppArmadillo and a re-ordered
+	  nested loop.
 
 	- Added references to recently accepted papers in
           help files.

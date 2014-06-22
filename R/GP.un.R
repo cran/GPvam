@@ -10,7 +10,7 @@ function (Z_mat, fixed_effects, control)
     H.eta <- function(G.inv, Z, R_inv) {
         h.eta <- G.inv
         h.y <- crossprod(Z, R_inv) %*% Z
-        Matrix(h.eta + h.y)
+        forceSymmetric(h.eta + h.y)
     }
     ltriangle <- function(x) {
         if (!is.null(dim(x)[2])) {
@@ -285,7 +285,7 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
     RE_mat <- teacheffZ_mat
     X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
     X_mat <- X_mat[, !(colSums(abs(X_mat)) == 0), drop = FALSE]
-    if (rankMatrix(X_mat)[1] != dim(X_mat)[2]) {
+    if (rankMatrix(X_mat,method = 'qrLINPACK')[1] != dim(X_mat)[2]) {
         stop("WARNING: Fixed-effects design matrix not full-rank")
     }
     RE_mat <- RE_mat[order(Z_mat$student, Z_mat$year, Z_mat$teacher), 
@@ -339,7 +339,6 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
         pattern.length[[p]] <- sum(pattern.key[p, ])
         pattern.countoverlength[[p]]<-pattern.count[[p]]/pattern.length[[p]]
     }
-    rm(Z.dense, X.dense)
     pattern.yguide <- list()
     for (g in 1:nyear) {
         pattern.yguide[[g]] <- which(pattern.key[, g] == 1)

@@ -5,14 +5,14 @@
 Maximum Likelihood Estimation of Multiple Membership Mixed Models Used in Value-Added Modeling
 }
 \description{
-An EM algorithm (Karl et al. 2013) is used to estimate the generalized and variable persistence models (Mariano et al. 2010).
+An EM algorithm (Karl et al. 2013) is used to estimate the generalized, variable, and complete persistence models (Mariano et al. 2010).
 }
 \details{
 \tabular{ll}{
 Package: \tab GPvam\cr
 Type: \tab Package\cr
-Version: \tab 3.0-1\cr
-Date: \tab 2014-01-31\cr
+Version: \tab 3.0-2\cr
+Date: \tab 2014-06-22\cr
 License: \tab GPL-2\cr
 }
 }

@@ -63,13 +63,13 @@ plotCI<-function (x, y = NULL, uiw, liw = uiw, ui, li, err = "y", ylim = NULL,
             gap <- strheight("O") * gap
         smidge <- par("fin")[1] * sfrac
         if (!is.null(li)) 
-            arrows(x, li, x, pmax(y - gap, li), col = barcol, 
+            suppressWarnings(arrows(x, li, x, pmax(y - gap, li), col = barcol, 
                 lwd = lwd, lty = lty, angle = 90, length = smidge, 
-                code = 1)
+                code = 1))
         if (!is.null(ui)) 
-            arrows(x, ui, x, pmin(y + gap, ui), col = barcol, 
+            suppressWarnings(arrows(x, ui, x, pmin(y + gap, ui), col = barcol, 
                 lwd = lwd, lty = lty, angle = 90, length = smidge, 
-                code = 1)
+                code = 1))
     }
     else {
         if (gap != FALSE) 
