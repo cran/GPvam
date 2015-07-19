@@ -135,10 +135,11 @@ When applied to an object of class GPvam, \code{\link{plot.GPvam}} returns a cat
  \code{\link{vam_data}}
 }
 \examples{
-\dontrun{
-#Not run
 data(vam_data)
- result <- GPvam(vam_data,student.side="R",persistence="VP",
+GPvam(vam_data,student.side="R",persistence="VP",
+fixed_effects=formula(~as.factor(year)+cont_var+0),verbose=TRUE,max.iter.EM=1)
+\donttest{
+result <- GPvam(vam_data,student.side="R",persistence="VP",
 fixed_effects=formula(~as.factor(year)+cont_var+0),verbose=TRUE)
  summary(result)
 

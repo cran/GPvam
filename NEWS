@@ -1,3 +1,6 @@
+Version 3.0-3: 2015-07-19
+	- Minor updates to package structure to conform with new CRAN requirements.
+
 Version 3.0-2: 2014-06-22
 	
 	- Changed method used to calculate rank of X matrix to 
