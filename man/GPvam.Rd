@@ -5,8 +5,7 @@
 Fitting the Generalized and Variable Persistence Models
 }
 \description{
-GPvam is used to fit the value-added model developed by Mariano et al. (2010) via ML estimation using an EM algorithm (Karl et al. 2013). Also provides the ability to fit the 
-variable persistence model (Lockwood et al. 2007).
+An EM algorithm, Karl et al. (2013) <doi:10.1016/j.csda.2012.10.004>, is used to estimate the generalized, variable, and complete persistence models, Mariano et al. (2010) <doi:10.3102/1076998609346967>. These are multiple-membership linear mixed models with teachers modeled as "G-side" effects and students modeled with either "G-side" or "R-side" effects.
 }
 \usage{
 GPvam(vam_data, fixed_effects = formula(~as.factor(year) + 0), 
@@ -58,7 +57,7 @@ future-year effects for each teacher. By setting \code{student.side="R"}, the in
 modeled via an unstructured, block-diagonal error covariance matrix, as specified by Mariano et al. (2010). Setting 
 \code{student.side="G"} keeps the same teacher structure, but models intra-student correlation via 
 random student effects. This is similar to the model used by McCaffrey and Lockwood (2011), and is appropriate when the testing 
-scale is the same across years. In this case, the error covariance matrix is diagonal, although a separate variance is calcualted for each year.
+scale is the same across years. In this case, the error covariance matrix is diagonal, although a separate variance is calculated for each year.
 From a computational perspective, the model estimating the R-side student effects has better scalability properties, although the G-side function is faster (Karl et al. 2012).
 
 The \code{persistence} option determines the type of persistence effects that are modeled. The generalized persistence model ("GP") is described above. When \code{student.side="R"}, other models for teacher persistence are available. The reduced GP model  ("rGP", Karl et al. 2012) combines each teacher's future year effects from the GP model into a single effect. The variable persistence model ("VP") assumes that teacher effects in future years are multiples of their effect in the current year (Lockwood et al. 2007). The multipliers in the VP model are called persistence parameters, and are estimated. By contrast, the complete ("CP") and zero ("ZP") persistence models fix the persistence parameters at 1 and 0, respectively (Lockwood et al. 2007). 
@@ -120,7 +119,7 @@ Andrew Karl \email{akarl@asu.edu}, Yan Yang, Sharon Lohr
 }
 \note{
 The model assumes that each teacher teaches only one year. If, for example, a teacher teaches in years 1 and 2, his/her first year performance is modeled independently of the second year performance.
-To keep these effects seperate, the progam appends "(year i)" to each teacher name, where i is the year in which the teacher taught.
+To keep these effects separate, the progam appends "(year i)" to each teacher name, where i is the year in which the teacher taught.
 
 The \code{fixed_effects} argument of \code{GPvam} utilizes the functionality of R's \code{formula} class. In the statement \code{fixed_effects=formula(~as.factor(year)+cont_var+0))}, \code{as.factor(year)} identifies \code{year} as a categorical variable. \code{+0} indicates that no intercept is to be fitted, and \code{+cont_var} indicates that a seperate effect is to be fitted for the continuous variable "cont_var." An interaction between "year" and "cont_var" could be specified by \code{~as.factor(year)*cont_var+0}, or equivalently, \code{~as.factor(year)+cont_var+as.factor(year):cont_var+0}. See \code{\link{formula}} for more details.
 

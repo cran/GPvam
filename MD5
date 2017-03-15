@@ -1,6 +1,6 @@
-629dfcf886933a675f519135b206b31e *DESCRIPTION
-809f45fb7686b0de07c7a3e2ca2f6bb8 *NAMESPACE
-d01379bd290a5c3429cb1d9b0ae24205 *NEWS
+c29fcb6c3d0b3ed50d7f5f26ba8dcc7b *DESCRIPTION
+e132f95f77e116aeb010f40bb6996e53 *NAMESPACE
+8ba2efefe0c59edb4c05a042d1466917 *NEWS
 95a7bf1ffb358d6daca1391be1706ed3 *R/GP.csh.R
 1c5c18cfba751d6c51bcaf7af4d36a3b *R/GP.un.R
 e9c11a85a75631f7bd22eb54279eb360 *R/GPvam.R
@@ -14,8 +14,8 @@ e9c11a85a75631f7bd22eb54279eb360 *R/GPvam.R
 5ac0db57bbe241d7225177276d8adfea *data/vam_data.rda
 8a9406b94d1196774fa369be43b2d9a0 *man/GP.csh.Rd
 d1cc9879738878980ef1be28a084d1df *man/GP.un.Rd
-1b89432022af3817c72a45206ffece18 *man/GPvam-package.Rd
-db057fc8625ebb6dd8a994b800f67023 *man/GPvam.Rd
+1352a38cf869774761c979ea639ed682 *man/GPvam-package.Rd
+b513576bf5f0d62c5f41d90bb5366a7f *man/GPvam.Rd
 5b34fe446c1bec59d109933534849f94 *man/GPvam.benchmark.Rd
 f1a61d195577cceb8ddb4363c7fdb906 *man/VP.CP.ZP.un.Rd
 81e0fe69719d1c627c38cc835f305df2 *man/plot.Rd
@@ -23,6 +23,7 @@ c6969cd26f61c6880fa41876c0106afc *man/print.Rd
 f39f7108aae9c7c9fda55462dae402a0 *man/rGP.un.Rd
 aa176b4215c32f50b44e1417a794e69b *man/summary.Rd
 0ae51e7ecbb5cda0e754b0e16f440cea *man/vam_data.Rd
-95a5e0dc5dbdec9c251c142cb4cad286 *src/Makevars
-64be831ee13c45351b4d0839e550b59a *src/Makevars.win
+2a6f9e9e044a78154d3cfda5936d6f48 *src/Makevars
+8d46d69896a1f1d31ed76035a0e49d67 *src/Makevars.win
 6612e8c0760ccbd34f499272049ee904 *src/R_mstep.cpp
+ce8fd26ef2b6ff6420dea4342edc21ac *src/init.c

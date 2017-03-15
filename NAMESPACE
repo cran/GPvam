@@ -1,4 +1,4 @@
-useDynLib(GPvam)
+useDynLib(GPvam,.registration=TRUE)
 # Exported functions
 export(GPvam,print.GPvam,plot.GPvam,summary.GPvam)
 
