@@ -55,6 +55,7 @@ Other authors as listed above for the caterpillar plots.
 }
 \examples{
 data(vam_data)
+\donttest{
 GPvam(vam_data,student.side="R",persistence="VP",
 fixed_effects=formula(~as.factor(year)+cont_var+0),verbose=TRUE,max.iter.EM=1)
 \donttest{
@@ -63,6 +64,7 @@ fixed_effects=formula(~as.factor(year)+cont_var+0),verbose=TRUE)
  summary(result)
 
  plot(result)
+}                
 }
 }
 \keyword{ regression }

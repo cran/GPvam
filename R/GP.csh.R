@@ -192,11 +192,11 @@ function (Z_mat, fixed_effects, control)
       Z_mat <- Z_mat[order(Z_mat$year, Z_mat$teacher), ]
       na_list <- grep("^NA", Z_mat$teacher)
       if (length(na_list) > 0) {
-          teachyearcomb <- unique(cBind(Z_mat[-na_list, ]$year, 
+          teachyearcomb <- unique(cbind(Z_mat[-na_list, ]$year, 
               Z_mat[-na_list, ]$teacher))
       }
       else {
-          teachyearcomb <- unique(cBind(Z_mat$year, Z_mat$teacher))
+          teachyearcomb <- unique(cbind(Z_mat$year, Z_mat$teacher))
       }
       nteach_effects <- sum(nyear - as.numeric(teachyearcomb[, 
           1]) + 1)
@@ -217,7 +217,7 @@ function (Z_mat, fixed_effects, control)
               t_effects[indx] <- paste(teachyearcomb[k, 1], "_", 
                   teachyearcomb[k, 2], "_", yr, sep = "")
               indx <- indx + 1
-              eblup.tracker <- rBind(eblup.tracker, c(teachyearcomb[k, 
+              eblup.tracker <- rbind(eblup.tracker, c(teachyearcomb[k, 
                   ], yr))
           }
       }
@@ -227,7 +227,7 @@ function (Z_mat, fixed_effects, control)
       nteacher <- as.vector(tapply(teachyearcomb[, 2], teachyearcomb[, 
           1], length))
       colnames(teacheffZ_mat) <- t_effects
-      RE_mat <- cBind(RE_mat, teacheffZ_mat)
+      RE_mat <- cbind(RE_mat, teacheffZ_mat)
       Sig.mat <- sparse.model.matrix(~as.factor(Z_mat$year) + 0)
       X_mat <- sparse.model.matrix(fixed_effects, Z_mat, drop.unused.levels = TRUE)
       X_mat <- X_mat[, !(colSums(abs(X_mat)) == 0)]
@@ -383,7 +383,7 @@ function (Z_mat, fixed_effects, control)
               1/(year.count) * sapply(cross_Z_j, function(x) as.numeric(crossprod(eta.hat, 
                   x %*% eta.hat))))
           sigmasn <- sqrt(sigmas2n)
-          eblup <- cBind(eta.hat, sqrt(diag(var.eta.hat)))
+          eblup <- cbind(eta.hat, sqrt(diag(var.eta.hat)))
           temp_mat <- var.eta.hat
           rm(var.eta.hat)
           temp_mat <- temp_mat + tcrossprod(eta.hat, eta.hat)
@@ -461,16 +461,16 @@ function (Z_mat, fixed_effects, control)
       }
       R_inv <- Diagonal(x = as.vector(Sig.mat %*% (1/(sigmas^2))))
       c.temp <- as(crossprod(X, R_inv) %*% Z, "TsparseMatrix")
-      c.1 <- rBind(as(crossprod(X, R_inv) %*% X, "TsparseMatrix"), 
+      c.1 <- rbind(as(crossprod(X, R_inv) %*% X, "TsparseMatrix"), 
           t(c.temp))
       G.inv <- chol2inv(chol(G))
-      c.2 <- rBind(c.temp, H.eta(sigmas, cross_Z_j, Sig.mat, G.inv, 
+      c.2 <- rbind(c.temp, H.eta(sigmas, cross_Z_j, Sig.mat, G.inv, 
           nyear, n_eta))
-      C_inv <- cBind(c.1, c.2)
+      C_inv <- cbind(c.1, c.2)
       C <- solve(C_inv)
       eblup_stderror <- sqrt(diag(C)[-c(1:n_ybeta)])
       ybetas_stderror <- sqrt(diag(C)[1:n_ybeta])
-      eblup <- cBind(eta.hat, eblup_stderror)
+      eblup <- cbind(eta.hat, eblup_stderror)
       eblup <- round(eblup, 4)
       eblup <- eblup[-(1:nstudent), ]
       eblup <- as.data.frame(eblup)
@@ -495,13 +495,13 @@ function (Z_mat, fixed_effects, control)
       effect_la <- c(names(ybetas), paste("sigma^2_", control$key[1:nyear,1], 
           sep = ""), "student", t_lab)
       if (control$hessian == TRUE) {
-          parameters <- round(cBind(c(ybetas, thetas), c(ybetas_stderror, 
+          parameters <- round(cbind(c(ybetas, thetas), c(ybetas_stderror, 
               std_errors)), 4)
           colnames(parameters) <- c("Estimate", "Standard Error")
           rownames(parameters) <- as.character(effect_la)
       }
       if (control$hessian == FALSE) {
-          parameters <- round(cBind(c(ybetas, thetas), c(ybetas_stderror, 
+          parameters <- round(cbind(c(ybetas, thetas), c(ybetas_stderror, 
               rep(NA, length(thetas)))), 4)
           colnames(parameters) <- c("Estimate", "Standard Error")
           rownames(parameters) <- as.character(effect_la)

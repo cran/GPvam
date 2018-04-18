@@ -261,7 +261,7 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
             temp.exp$student <- mis_stu
             temp.exp$teacher <- rep(NA, le)
             temp.exp$y <- rep(NA, le)
-            Z_mat <- rBind(Z_mat, temp.exp)
+            Z_mat <- rbind(Z_mat, temp.exp)
         }
     }
     rm(g, le)
@@ -284,9 +284,9 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
         ]
     na_list <- grep("^NA", Z_mat$teacher)
     if (length(na_list) > 0) {
-        teachyearcomb <- unique(cBind(Z_mat[-na_list, ]$year, Z_mat[-na_list, ]$teacher))
+        teachyearcomb <- unique(cbind(Z_mat[-na_list, ]$year, Z_mat[-na_list, ]$teacher))
     }else {
-        teachyearcomb <- unique(cBind(Z_mat$year, Z_mat$teacher))
+        teachyearcomb <- unique(cbind(Z_mat$year, Z_mat$teacher))
     }
     
 
@@ -323,7 +323,7 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
               2]]
                             t_effects[k] <- paste(teachyearcomb[k, 1], "_", 
                   teachyearcomb[k, 2], sep = "")
-          eblup.tracker <- rBind(eblup.tracker, c(teachyearcomb[k, ], teachyearcomb[k,1]))
+          eblup.tracker <- rbind(eblup.tracker, c(teachyearcomb[k, ], teachyearcomb[k,1]))
           for (yr in as.numeric(teachyearcomb[k, 1]):nyear) {
               if (sum(is.element(Z_mat$student, student_subset) & 
                   Z_mat$year == yr) != 0) {
@@ -737,15 +737,15 @@ pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]
         }
     }
     c.temp <- crossprod(X, R_inv) %*% Z
-    c.1 <- rBind(crossprod(X, R_inv) %*% X, t(c.temp))
+    c.1 <- rbind(crossprod(X, R_inv) %*% X, t(c.temp))
     G.inv <- chol2inv(chol(G))
-    c.2 <- rBind(c.temp, H.eta(G.inv, Z, R_inv))
-    C_inv <- cBind(c.1, c.2)
+    c.2 <- rbind(c.temp, H.eta(G.inv, Z, R_inv))
+    C_inv <- cbind(c.1, c.2)
     C <- solve(C_inv)
     eblup_stderror <- sqrt(diag(C)[-c(1:n_ybeta)])
     ybetas_stderror <- sqrt(diag(C)[1:n_ybeta])
     rm(C,C_inv,c.2,c.1,c.temp)
-    eblup <- cBind(eta.hat, eblup_stderror)
+    eblup <- cbind(eta.hat, eblup_stderror)
     eblup <- round(eblup, 4)
     eblup <- as.data.frame(eblup)
     eblup.tracker <- as.data.frame(eblup.tracker)
@@ -788,13 +788,13 @@ pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]
     }
     
     if (control$hessian == TRUE) {
-        parameters <- round(cBind(c(ybetas, thetas), c(ybetas_stderror, 
+        parameters <- round(cbind(c(ybetas, thetas), c(ybetas_stderror, 
             std_errors)), 4)
         colnames(parameters) <- c("Estimate", "Standard Error")
         rownames(parameters) <- as.character(effect_la)
     }
     if (control$hessian == FALSE) {
-        parameters <- round(cBind(c(ybetas, thetas), c(ybetas_stderror, 
+        parameters <- round(cbind(c(ybetas, thetas), c(ybetas_stderror, 
             rep(NA, length(thetas)))), 4)
         colnames(parameters) <- c("Estimate", "Standard Error")
         rownames(parameters) <- as.character(effect_la)

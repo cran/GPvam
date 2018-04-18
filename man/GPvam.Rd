@@ -135,7 +135,7 @@ When applied to an object of class GPvam, \code{\link{plot.GPvam}} returns a cat
 }
 \examples{
 data(vam_data)
-GPvam(vam_data,student.side="R",persistence="VP",
+GPvam(vam_data,student.side="R",persistence="CP",
 fixed_effects=formula(~as.factor(year)+cont_var+0),verbose=TRUE,max.iter.EM=1)
 \donttest{
 result <- GPvam(vam_data,student.side="R",persistence="VP",

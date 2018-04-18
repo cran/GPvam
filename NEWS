@@ -1,3 +1,6 @@
+Version 3.0-5: 2018-04-18
+	- Minor updates to package structure to conform with new CRAN requirements.
+
 Version 3.0-4: 2017-03-15
 	- Minor updates to package structure to conform with new CRAN requirements
           related to compiled C++ code.
