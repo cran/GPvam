@@ -11,7 +11,7 @@ function (Z_mat, fixed_effects, control)
       H.eta <- function(sigmas, cross_Z_j, Sig.mat, G.inv, nyear, 
           n_eta) {
           h.eta <- G.inv
-          h.y <- Matrix(0, n_eta, n_eta)
+          h.y <- Matrix(0, n_eta, n_eta,doDiag=FALSE)
           for (j in 1:nyear) {
               h.y <- h.y + (1/sigmas[j]^2) * cross_Z_j[[j]]
           }
@@ -200,7 +200,7 @@ function (Z_mat, fixed_effects, control)
       }
       nteach_effects <- sum(nyear - as.numeric(teachyearcomb[, 
           1]) + 1)
-      teacheffZ_mat <- Matrix(0, nrow = nrow(Z_mat), ncol = nteach_effects)
+      teacheffZ_mat <- Matrix(0, nrow = nrow(Z_mat), ncol = nteach_effects,doDiag=FALSE)
       t_effects <- rep(NA, nteach_effects)
       indx <- 1
       eblup.tracker <- matrix(0, 0, 3)
@@ -237,10 +237,10 @@ function (Z_mat, fixed_effects, control)
       }
       n_eta <- nstudent + nteach_effects
       n_ybeta <- dim(X_mat)[2]
-      Z <- Matrix(RE_mat)
+      Z <- Matrix(RE_mat,doDiag=FALSE)
       cross_Z <- crossprod(Z)
       Y <- as.vector(Z_mat$y)
-      X <- Matrix(X_mat)
+      X <- Matrix(X_mat,doDiag=FALSE)
       cross_Z_j <- list()
       X_j <- list(NULL)
       cross_X_j <- list(NULL)
@@ -248,7 +248,7 @@ function (Z_mat, fixed_effects, control)
       Z_j <- list(NULL)
       for (j in 1:nyear) {
           cross_Z_j[[j]] <- crossprod(Matrix(RE_mat[Z_mat$year == 
-              j, ]))
+              j, ],doDiag=FALSE))
           X_j[[j]] <- X_mat[Z_mat$year == j, ]
           Y_j[[j]] <- as.vector(Z_mat[Z_mat$year == j, ]$y)
           Z_j[[j]] <- RE_mat[Z_mat$year == j, ]
@@ -256,7 +256,7 @@ function (Z_mat, fixed_effects, control)
       }
       rm(j)
       eta.hat <- numeric(n_eta)
-      var.eta.hat <- Matrix(0, n_eta, n_eta)
+      var.eta.hat <- Matrix(0, n_eta, n_eta,doDiag=FALSE)
       sigmas <- c(rep(1, nyear))
       ybetas <- update.ybeta(X_j = X_j, cross_X_j = cross_X_j, 
           Y_j = Y_j, Z_j = Z_j, sigmas = sigmas, eta.hat = eta.hat, 
@@ -265,10 +265,10 @@ function (Z_mat, fixed_effects, control)
       G <- 100 * .symDiagonal(nstudent + nteach_effects)
       cons.logLik <- 0.5 * n_eta * log(2 * pi)
       iter <- control$max.iter.EM
-      Y.mat <- Matrix(0, iter, n_ybeta)
+      Y.mat <- Matrix(0, iter, n_ybeta,doDiag=FALSE)
       G.mat <- Matrix(0, iter, length(reduce.G(G = G, nstudent = nstudent, 
-          nyear = nyear, nteacher = nteacher, Kg = Kg)))
-      sig.mat <- Matrix(0, iter, nyear)
+          nyear = nyear, nteacher = nteacher, Kg = Kg)),doDiag=FALSE)
+      sig.mat <- Matrix(0, iter, nyear,doDiag=FALSE)
       lgLik <- numeric(iter)
       conv <- FALSE
       if (control$verbose) cat("Beginning EM algorithm\n")
@@ -391,7 +391,7 @@ function (Z_mat, fixed_effects, control)
           gam_t <- list()
           index1 <- nstudent
           for (j in 1:nyear) {
-              gam_t[[j]] <- Matrix(0, Kg[j], Kg[j])
+              gam_t[[j]] <- Matrix(0, Kg[j], Kg[j],doDiag=FALSE)
               temp_mat_j <- temp_mat[(index1 + 1):(index1 + nteacher[j] * 
                   Kg[j]), (index1 + 1):(index1 + nteacher[j] * 
                   Kg[j])]

@@ -42,7 +42,7 @@ function (Z_mat, fixed_effects, control)
             resA
         }
         else {
-            resB <- Matrix(0, 0, 0)
+            resB <- Matrix(0, 0, 0,doDiag=FALSE)
             index <- 1
             for (j in 1:nyear) {
                 ne <- (Kg[j] * (Kg[j] + 1))/2
@@ -132,7 +132,7 @@ pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]
         score_mat <- var.eta.hat + tcrossprod(eta.hat, eta.hat)
         gam_t_sc <- list()
         index1 <- 0
-        score.G <- Matrix(0, 0, 0)
+        score.G <- Matrix(0, 0, 0,doDiag=FALSE)
         for (j in 1:nyear) {
             gam_t_sc[[j]] <- matrix(0, Kg[j], Kg[j])
             score_mat_j <- score_mat[(index1 + 1):(index1 + nteacher[j] * 
@@ -254,7 +254,7 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
     }
     nteach_effects <- sum(nyear - as.numeric(teachyearcomb[, 
         1]) + 1)
-    teacheffZ_mat <- Matrix(0, nrow = nrow(Z_mat), ncol = nteach_effects)
+    teacheffZ_mat <- Matrix(0, nrow = nrow(Z_mat), ncol = nteach_effects,doDiag=FALSE)
     t_effects <- rep(NA, nteach_effects)
     indx <- 1
     eblup.tracker <- matrix(0, 0, 3)
@@ -298,10 +298,10 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
         Z_mat.full$teacher), ]
     n_eta <- nteach_effects
     n_ybeta <- dim(X_mat)[2]
-    Z <- Matrix(RE_mat)
+    Z <- Matrix(RE_mat,doDiag=FALSE)
     huge.flag<-TRUE
     Y <- as.vector(Z_mat$y)
-    X <- Matrix(X_mat)
+    X <- Matrix(X_mat,doDiag=FALSE)
     if(!huge.flag){
     Z.dense <- as.matrix(Z)
     X.dense <- as.matrix(X)
@@ -357,7 +357,7 @@ pattern.f.score <- function(R_i.parm, nyear, pattern.parmlist2, pattern.count, p
             f <- function(x) r.parm %in% x))
     }
     eta.hat <- numeric(n_eta)
-    var.eta.hat <- Matrix(0, n_eta, n_eta)
+    var.eta.hat <- Matrix(0, n_eta, n_eta,doDiag=FALSE)
     R.temp.comp <- numeric(nyear)
     for (g in 1:nyear) {
         R.temp.comp[g] <- var(Z_mat[Z_mat$year == g, ]$y)/4
@@ -393,10 +393,10 @@ nonempty.patterns<-c(nonempty.patterns,p)
     G <- 100*.symDiagonal(n_eta)
     cons.logLik <- 0.5 * n_eta * log(2 * pi)
     iter <- control$max.iter.EM
-    Y.mat <- Matrix(0, iter, n_ybeta)
+    Y.mat <- Matrix(0, iter, n_ybeta,doDiag=FALSE)
     G.mat <- Matrix(0, iter, length(reduce.G(G = G, nyear = nyear, 
-        nteacher = nteacher, Kg = Kg)))
-    R.mat <- Matrix(0, iter, nyear * (nyear + 1)/2)
+        nteacher = nteacher, Kg = Kg)),doDiag=FALSE)
+    R.mat <- Matrix(0, iter, nyear * (nyear + 1)/2,doDiag=FALSE)
     lgLik <- numeric(iter)
     conv <- FALSE
    if (control$verbose) cat("Beginning EM algorithm\n")
@@ -503,7 +503,7 @@ nonempty.patterns<-c(nonempty.patterns,p)
         gam_t <- list()
         index1 <- 0
         for (j in 1:nyear) {
-            gam_t[[j]] <- Matrix(0, Kg[j], Kg[j])
+            gam_t[[j]] <- Matrix(0, Kg[j], Kg[j],doDiag=FALSE)
             temp_mat_j <- temp_mat[(index1 + 1):(index1 + nteacher[j] * 
                 Kg[j]), (index1 + 1):(index1 + nteacher[j] * 
                 Kg[j])]
@@ -518,7 +518,7 @@ nonempty.patterns<-c(nonempty.patterns,p)
         }
         rm(j, k, index2, index1)
         ybetasn <- numeric(n_ybeta)
-        Gn <- Matrix(0, 0, 0)
+        Gn <- Matrix(0, 0, 0,doDiag=FALSE)
         for (j in 1:nyear) {
             Gn <- bdiag(Gn, suppressMessages(kronecker(suppressMessages(.symDiagonal(nteacher[j])), 
                 gam_t[[j]])))

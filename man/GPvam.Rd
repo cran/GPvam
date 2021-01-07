@@ -10,7 +10,7 @@ An EM algorithm, Karl et al. (2013) <doi:10.1016/j.csda.2012.10.004>, is used to
 \usage{
 GPvam(vam_data, fixed_effects = formula(~as.factor(year) + 0), 
    student.side = "R", persistence="GP", max.iter.EM = 1000, tol1 = 1e-07, 
-   hessian = FALSE, hes.method = "simple", verbose = TRUE)
+   hessian = FALSE, hes.method = "simple", REML = FALSE, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -45,6 +45,9 @@ logical indicating whether the Hessian of the variance parameters (and persisten
   \item{hes.method}{
 a character string indicating the method of numerical differentiation used
             to calculate the Hessian of the variance parameters. Options are "simple" or "richardson".
+}
+  \item{REML}{
+logical indicating whether REML estimation should be used instead of ML estimation. Only currently compatible with persistence = CP, VP, or ZP.
 }
   \item{verbose}{
 logical. If TRUE, model information will be printed at each iteration.

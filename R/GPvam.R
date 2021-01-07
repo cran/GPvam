@@ -1,9 +1,9 @@
 GPvam <-
 function (vam_data, fixed_effects = formula(~as.factor(year) + 
     0), student.side = "R", persistence="GP", max.iter.EM = 1000, 
-    tol1 = 1e-07, hessian = FALSE, hes.method = "simple", verbose = TRUE) 
+    tol1 = 1e-07, hessian = FALSE, hes.method = "simple",REML=FALSE, verbose = TRUE) 
 {
-    control<-list(max.iter.EM=max.iter.EM,tol1=tol1,hessian=hessian,hes.method=hes.method,verbose=verbose,persistence=persistence)
+    control<-list(max.iter.EM=max.iter.EM,tol1=tol1,hessian=hessian,hes.method=hes.method,verbose=verbose,persistence=persistence,REML=REML)
     Z_mat <- vam_data
     if (class(try(na.fail(Z_mat[, !(names(Z_mat) %in% c("teacher", 
         "y"))]), silent = TRUE)) == "try-error") {
@@ -20,6 +20,11 @@ function (vam_data, fixed_effects = formula(~as.factor(year) +
     cat("*Error: student.side and persistence must be characters (using quotation marks)")
         flush.console()
         return(0)
+    }
+    if (REML == TRUE & !(persistence=="VP"|persistence=="CP"|persistence=="ZP")) {
+      cat("*Error: REML only currently compatible with persistence = VP, CP, or ZP. Contact the package maintainer if you would like functionality for GP.")
+      flush.console()
+      return(0)
     }
     original_year<-Z_mat$year
     tyear<- factor(Z_mat$year,ordered=TRUE)
