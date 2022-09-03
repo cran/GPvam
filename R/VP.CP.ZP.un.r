@@ -515,7 +515,7 @@ VP.CP.ZP.un <-
             i = dP[[i]][[j]][, 1],
             j = dP[[i]][[j]][, 2],
             dims = c(nrow(Z_mat), nteach_effects)
-          ), "dgCMatrix")
+          ), "dMatrix")
     }
     Z <- Matrix(0, nrow(Z_mat), nteach_effects,doDiag=FALSE)
     for (i in 1:nalpha) {

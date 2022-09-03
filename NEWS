@@ -1,3 +1,6 @@
+Version 3.0-8: 2022-09-03
+	- Changes to Matrix() references to conform with Matrix package changes.
+
 Version 3.0-7: 2021-01-05
 	- Changes to Matrix() references to conform with Matrix package changes.
 
