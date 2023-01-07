@@ -11,8 +11,8 @@ An EM algorithm, Karl et al. (2013) <doi:10.1016/j.csda.2012.10.004>, is used to
 \tabular{ll}{
 Package: \tab GPvam\cr
 Type: \tab Package\cr
-Version: \tab 3.0-8\cr
-Date: \tab 2022-09-03\cr
+Version: \tab 3.0-9\cr
+Date: \tab 2023-01-07\cr
 License: \tab GPL-2\cr
 }
 }
