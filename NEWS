@@ -1,3 +1,6 @@
+Version 3.1-1: 2024-10-14
+	- Correct data format check in GPvam.R
+
 Version 3.0-9: 2023-01-07
 	- Changes to DESCRIPTION file.
 

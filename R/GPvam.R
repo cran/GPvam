@@ -5,11 +5,13 @@ function (vam_data, fixed_effects = formula(~as.factor(year) +
 {
     control<-list(max.iter.EM=max.iter.EM,tol1=tol1,hessian=hessian,hes.method=hes.method,verbose=verbose,persistence=persistence,REML=REML)
     Z_mat <- vam_data
-    if (inherits(class("method"), "character")) {
-        cat("*Error: NA values present.\n*NA values are allowed for the 'teacher; and 'y' variables, but no others.\n*Please remove these observations from your data frame.\n")
-        flush.console()
-        return(0)
-    }
+# Identify columns that should not contain NA values
+columns_to_check <- setdiff(names(Z_mat), c("teacher", "y"))
+
+# Check for NA values in these columns
+if (any(is.na(Z_mat[, columns_to_check]))) {
+    stop("*Error: NA values present.\n*NA values are allowed for the 'teacher' and 'y' variables, but no others.\n*Please remove these observations from your data frame.\n")
+}
     if (student.side == "G" & persistence!="GP") {
     cat("*Error: student.side=\"G\" may only be paired with persistence=\"GP\"")
         flush.console()

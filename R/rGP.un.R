@@ -718,10 +718,24 @@ pattern.sum[[p]]<-R_mstep2(invsqrtW_=as.matrix(rep(1,Ny)),JYp_=as.matrix(Y.p[[p]
     yhat.s <- try(as.vector(rchol %*% (yhat)))
     sresid <- try(as.vector(rchol %*% Y - yhat.s))
     teach.cov <- lapply(gam_t, function(x) round(x, 4))
+    G.inv<-chol2inv(chol(symmpart(G)))
+    R.inv<-R_inv
+    T<-chol2inv(chol(symmpart(t(Z) %*% R.inv %*% Z + G.inv)))
+    #V^{-1}
+    vinv <- R.inv - R.inv %*% Z %*% T %*% t(Z) %*% R.inv
     list(loglik = lgLik, teach.effects = eblup, parameters = parameters, 
         Hessian = Hessian, R_i = as.matrix(R_i), teach.cov = gam_t, 
         mresid = mresid, cresid = cresid, y = Y, yhat = yhat, 
         stu.cov = NA, num.obs = Ny, num.student = nstudent, num.year = nyear, 
         num.teach = nteacher, yhat.m = yhat.m, sresid = sresid, 
-        yhat.s = yhat.s,iter=it,persistence=control$persistence)
+        yhat.s = yhat.s,iter=it,persistence=control$persistence,       
+        R.inv=R.inv,
+        G=G,
+        Z=Z,
+        eta.hat=eta.hat,
+        G.inv=G.inv,
+        T=T,
+        vinv=vinv,
+        X=X,
+        ybetas=ybetas)
 }

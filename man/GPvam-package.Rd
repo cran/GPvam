@@ -11,8 +11,8 @@ An EM algorithm, Karl et al. (2013) <doi:10.1016/j.csda.2012.10.004>, is used to
 \tabular{ll}{
 Package: \tab GPvam\cr
 Type: \tab Package\cr
-Version: \tab 3.1-0\cr
-Date: \tab 2024-04-05\cr
+Version: \tab 3.1-1\cr
+Date: \tab 2024-10-14\cr
 License: \tab GPL-2\cr
 }
 }
@@ -27,6 +27,8 @@ Karl, A., Yang, Y. and Lohr, S. (2013) Efficient Maximum Likelihood Estimation o
 Karl, A., Yang, Y. and Lohr, S. (2014) Computation of Maximum Likelihood Estimates for Multiresponse Generalized Linear Mixed Models with Non-nested, Correlated Random Effects \emph{Computational Statistics & Data Analysis} \bold{73}, 146--162.
 
 Karl, A., Yang, Y. and Lohr, S. (2014) A Correlated Random Effects Model for Nonignorable Missing Data in Value-Added Assessment of Teacher Effects \emph{Journal of Educational and Behavioral Statistics} \bold{38}, 577--603.
+
+Karl, A., Zimmerman, D. (2021) A diagnostic for bias in linear mixed model estimators induced by dependence between the random effects and the corresponding model matrix \emph{Journal of Statistical Planning and Inference} \bold{211}, 107--118.
 
 Lockwood, J., McCaffrey, D., Mariano, L., Setodji, C. (2007) Bayesian Methods for Scalable Multivariate Value-Added Assesment. \emph{Journal of Educational and Behavioral Statistics} \bold{32}, 125--150. 
 

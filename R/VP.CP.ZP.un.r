@@ -1230,6 +1230,11 @@ VP.CP.ZP.un <-
     sresid <- try(as.vector(rchol %*% Y - yhat.s))
     teach.cov <- lapply(gam_t, function(x)
       round(x, 4))
+    G.inv<-chol2inv(chol(symmpart(G)))
+    R.inv<-R_inv
+    T<-chol2inv(chol(symmpart(t(Z) %*% R.inv %*% Z + G.inv)))
+    #V^{-1}
+    vinv <- R.inv - R.inv %*% Z %*% T %*% t(Z) %*% R.inv
     L <-
       list(
         loglik = lgLik,
@@ -1252,6 +1257,16 @@ VP.CP.ZP.un <-
         yhat.s = yhat.s,
         iter = it,
         persistence = control$persistence,
-        betacov=betacov
+        betacov=betacov,
+        R.inv=R.inv,
+        G=G,
+        Z=Z,
+        eta.hat=eta.hat,
+        G.inv=G.inv,
+        T=T,
+        vinv=vinv,
+        X=X,
+        ybetas=ybetas
+        
       )
   }
