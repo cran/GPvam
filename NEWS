@@ -1,3 +1,7 @@
+Version 3.1-2: 2024-11-17
+	- Correct permutations in bias.test.custom() to occur independently over random effects
+	      belonging to different variance components. Not yet enabled for "GP" or "rGP" persistence.
+
 Version 3.1-1: 2024-10-14
 	- Correct data format check in GPvam.R
 

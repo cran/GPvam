@@ -1,19 +1,20 @@
-#library(MASS)
-#library(ggplot2)
-#library(patchwork)
-# Define the function
 bias.test.custom <- function(result, 
-                                  k_vectors = NULL, 
-                                  n_perms = 1e5, 
-                                  save_plots = FALSE, 
-                                  output_folder = ".") {
+                             k_vectors = NULL, 
+                             n_perms = 1e5, 
+                             save_plots = FALSE, 
+                             output_folder = ".") {
   
   # Ensure that the required components exist in the result object
-  required_components <- c("X", "Z", "vinv", "eta.hat")
+  required_components <- c("X", "Z", "vinv", "eta.hat", "G", "num.teach", "persistence")
   missing_components <- setdiff(required_components, names(result))
   if(length(missing_components) > 0){
     stop(paste("The result object is missing the following components:", 
                paste(missing_components, collapse = ", ")))
+  }
+  
+  # Check persistence
+  if(!(result$persistence %in% c("CP", "VP", "ZP"))){
+    warning("The function is currently not enabled for persistence types other than 'CP', 'VP', or 'ZP'.")
   }
   
   # Extract fixed effect names and count
@@ -60,15 +61,18 @@ bias.test.custom <- function(result,
       # Create strings like "1 * fixed_name1 + -1 * fixed_name3"
       term_strings <- sapply(terms, function(idx) {
         coef <- k[idx]
-        # Format coefficient: avoid "+ -1", instead use "-1"
-        if(coef < 0){
-          return(paste0(coef, " * ", fixed_names[idx]))
+        if(coef == 1){
+          return(fixed_names[idx])
+        } else if(coef == -1){
+          return(paste0("- ", fixed_names[idx]))
         } else {
           return(paste0(coef, " * ", fixed_names[idx]))
         }
       })
       # Combine terms with " + "
       full_name <- paste(term_strings, collapse = " + ")
+      # Clean up signs
+      full_name <- gsub("\\+ -", "- ", full_name)
       return(full_name)
     })
     names(k_list) <- k_names
@@ -76,23 +80,11 @@ bias.test.custom <- function(result,
   
   # Initialize storage vectors
   n_tests <- length(k_list)
-  permutation_percentile_rec <- numeric(n_tests)
-  names(permutation_percentile_rec) <- names(k_list)
+  permutation_p_value_rec <- numeric(n_tests)
+  names(permutation_p_value_rec) <- names(k_list)
   
   nu_prime_eta_rec <- numeric(n_tests)
   names(nu_prime_eta_rec) <- names(k_list)
-  
-  mean_nu_eta_ttest_rec <- numeric(n_tests)
-  names(mean_nu_eta_ttest_rec) <- names(k_list)
-  
-  mean_eta_hat_rec <- numeric(n_tests)
-  names(mean_eta_hat_rec) <- names(k_list)
-  
-  p_value_nu_eta_test_rec <- numeric(n_tests)
-  names(p_value_nu_eta_test_rec) <- names(k_list)
-  
-  p_value_eta_hat_test_rec <- numeric(n_tests)
-  names(p_value_eta_hat_test_rec) <- names(k_list)
   
   # Initialize a list to store plots
   plot_list <- list()
@@ -103,6 +95,19 @@ bias.test.custom <- function(result,
       dir.create(output_folder, recursive = TRUE)
     }
   }
+  
+  # Identify indices for each variance component in G
+  num_teach <- result$num.teach
+  cum_teach <- c(0, cumsum(num_teach))
+  n_eta <- length(result$eta.hat)
+  if(cum_teach[length(cum_teach)] != n_eta){
+    stop("The sum of num.teach does not match the length of eta.hat.")
+  }
+  
+  # Permutation indices for each group
+  group_indices <- lapply(1:length(num_teach), function(i){
+    (cum_teach[i] + 1):cum_teach[i + 1]
+  })
   
   # Loop over each k vector
   for(j in 1:n_tests){
@@ -120,29 +125,24 @@ bias.test.custom <- function(result,
     # Initialize permutation record
     permutation.record <- numeric(n_perms)
     
-    # Perform the permutation test
+    # Perform the permutation test with group-wise permutations
     for(p in 1:n_perms){
-      shuffled_eta_hat <- sample(result$eta.hat)
+      shuffled_eta_hat <- result$eta.hat
+      # Permute within each group
+      for(g in seq_along(group_indices)){
+        idx <- group_indices[[g]]
+        shuffled_eta_hat[idx] <- sample(result$eta.hat[idx])
+      }
       permutation.record[p] <- as.numeric(nu %*% shuffled_eta_hat)
     }
     
-    # Compute permutation percentile
-    permutation_percentile_rec[j] <- ecdf(c(permutation.record, observed.value))(observed.value)
+    # Compute permutation p-value
+    permutation_p_value_rec[j] <- mean(abs(permutation.record) >= abs(observed.value))
     
     # Record nu'eta
     nu_prime_eta_rec[j] <- observed.value
     
-    # Compute means
-    mean_nu_eta_ttest_rec[j] <- mean(permutation.record)
-    mean_eta_hat_rec[j] <- mean(result$eta.hat)
-    
-    # Perform t-tests
-    p_value_nu_eta_test_rec[j] <- t.test(permutation.record)$p.value
-    p_value_eta_hat_test_rec[j] <- t.test(as.vector(result$eta.hat))$p.value
-    
-    # **Plotting Section**
-    permutation_record<-0
-    # Create a data frame for plotting
+    # Plotting Section
     plot_data <- data.frame(
       permutation_record = permutation.record
     )
@@ -153,19 +153,20 @@ bias.test.custom <- function(result,
     x_max <- max(combined_values) + 0.05 * abs(max(combined_values))
     
     # Generate the histogram with ggplot2
-    p <- ggplot(plot_data, aes(x = permutation_record)) +
+    p <- ggplot(plot_data, aes(x = .data$permutation_record)) +  # Updated line
       geom_histogram(binwidth = (x_max - x_min) / 100, fill = "lightblue", color = "black") +
-      geom_vline(xintercept = observed.value, color = "red", linewidth = 1.2) +  # Updated 'linewidth'
+      geom_vline(xintercept = observed.value, color = "red", linewidth = 1.2) +
       labs(
-        title = paste("Test for:", fe_name),
-        x = expression(nu %*% eta),
+        title = paste("Permutation Test for:", fe_name),
+        x = expression(nu %*% hat(eta)),
         y = "Frequency"
       ) +
-      coord_cartesian(xlim = c(x_min, x_max)) +  # Use coord_cartesian instead of xlim
+      coord_cartesian(xlim = c(x_min, x_max)) +
       theme_minimal()
     
     # Display the plot
     print(p)
+    
     
     # Save the plot if required
     if(save_plots){
@@ -179,44 +180,43 @@ bias.test.custom <- function(result,
     plot_list[[j]] <- p
     
     # Progress Indicator
-    cat("Completed permutation test and plot for fixed effect:", fe_name, "\n")
+    cat("Completed permutation test and plot for fixed effect:", fe_name, "(", j, "of", n_tests, ")\n")
     
   }
   
-  # **Combine all plots into a single multi-panel figure using patchwork**
-  if(length(plot_list) > 0){
+  # Combine all plots into a single multi-panel figure using patchwork
+  if(length(plot_list) > 0 && n_tests > 1){
     # Determine grid layout based on the number of plots
     n_cols_combined <- ceiling(sqrt(n_tests))
     n_rows_combined <- ceiling(n_tests / n_cols_combined)
-
-# Combine plots
-combined_plot <- wrap_plots(plot_list, ncol = n_cols_combined, nrow = n_rows_combined) + 
-  plot_annotation(title = "Permutation Test Results for All Fixed Effects")
-
-# Display the combined plot
-print(combined_plot)
-
-# Save the combined plot if required
-if(save_plots){
-  ggsave("combined_permutation_tests.png", combined_plot, 
-         path = output_folder, width = 4 * n_cols_combined, 
-         height = 4 * n_rows_combined)
-  cat("Saved combined permutation tests plot as", 
-      file.path(output_folder, "combined_permutation_tests.png"), "\n")
-}
+    
+    # Combine plots
+    combined_plot <- wrap_plots(plot_list, ncol = n_cols_combined, nrow = n_rows_combined) + 
+      plot_annotation(title = "Permutation Test Results for All Fixed Effects")
+    
+    # Display the combined plot
+    print(combined_plot)
+    
+    # Save the combined plot if required
+    if(save_plots){
+      ggsave("combined_permutation_tests.png", combined_plot, 
+             path = output_folder, width = 4 * n_cols_combined, 
+             height = 4 * n_rows_combined)
+      cat("Saved combined permutation tests plot as", 
+          file.path(output_folder, "combined_permutation_tests.png"), "\n")
+    }
   }
   
-  # **Compile the results into a data frame**
+  # Compile the results into a data frame
   permutation_results <- data.frame(
     Fixed_Effect = names(k_list),
-    Permutation_Percentile = permutation_percentile_rec,
     Nu_Prime_Eta = nu_prime_eta_rec,
-    Mean_Nu_Eta = mean_nu_eta_ttest_rec,
-    Mean_Eta_Hat = mean_eta_hat_rec,
-    P_Value_Nu_Eta_Test = p_value_nu_eta_test_rec,
-    P_Value_Eta_Hat_Test = p_value_eta_hat_test_rec,
+    Permutation_P_Value = permutation_p_value_rec,
     stringsAsFactors = FALSE
   )
+  
+  # Arrange the columns
+  permutation_results <- permutation_results[, c("Fixed_Effect", "Nu_Prime_Eta", "Permutation_P_Value")]
   
   # Print the results data frame
   print(permutation_results)
@@ -232,5 +232,3 @@ if(save_plots){
   # Return the results and plots
   return(list(permutation_results = permutation_results, plot_list = plot_list))
 }
-
-
