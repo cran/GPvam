@@ -9,9 +9,7 @@ Performs permutation tests on fixed effects within a linear mixed model to asses
 \usage{
 bias.test.custom(result, 
                  k_vectors = NULL, 
-                 n_perms = 1e5, 
-                 save_plots = FALSE, 
-                 output_folder = ".")
+                 n_perms = 1e5)
 }
 \arguments{
   \item{result}{
@@ -35,13 +33,7 @@ bias.test.custom(result,
     (Optional) The number of permutations to perform for each \eqn{k} vector. A higher number of permutations increases the accuracy of the p-value estimates but also increases computation time. Default is \code{1e5}.
   }
   
-  \item{save_plots}{
-    (Optional) Logical flag indicating whether to save the permutation test histograms as PNG files. If set to \code{TRUE}, histograms for each \eqn{k} vector will be saved in the specified \code{output_folder}. Default is \code{FALSE}.
-  }
-  
-  \item{output_folder}{
-    (Optional) Directory path where plots and results will be saved if \code{save_plots} is \code{TRUE}. The directory will be created if it does not exist. Default is the current working directory (\code{"."}).
-  }
+
 }
 \value{
 A list containing:

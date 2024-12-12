@@ -1,13 +1,13 @@
-824817f664d822b335718e98899f4845 *DESCRIPTION
+b05cdae78dd4b7bbfa74033ce171144c *DESCRIPTION
 2345a2b5c7733e22406aa35a4514d2b0 *NAMESPACE
-f92e89b26c279f8c2e47e2181564393d *NEWS
+f97291bd70d9788b7a177ff76bacdd68 *NEWS
 57de3c0b632bcb55d62f4c09fa2cd667 *R/GP.csh.R
 7323756dc5895b4c12b967354ffad3af *R/GP.un.R
 99bbdd4c5bc8cdf4822384f77bb3a226 *R/GPvam.R
 92667cf287a9b70a2a9dc9bfd431b247 *R/REML_Rm.R
 6398ce377d07480e3ae1fdd88d0966f9 *R/R_mstep2.R
 d777ae64bfc99b56b5c101bfababfa18 *R/VP.CP.ZP.un.r
-36f957a0d3de31871cefcb17c1a99b56 *R/bias.test.custom.R
+5317be2463c105ec3ef4f8ebf42476ef *R/bias.test.custom.R
 5942339428fca9589f5a29ba74e45026 *R/plot.GPvam.R
 3a68b2896258357d56c42eccb0369de9 *R/print.GPvam.R
 9b54e3ed7dfc9c4ddbfe73de77489d1f *R/print.summary.GPvam.R
@@ -21,7 +21,7 @@ d1cc9879738878980ef1be28a084d1df *man/GP.un.Rd
 9e72347fc39f57b363837f5006eb59bd *man/GPvam.Rd
 5b34fe446c1bec59d109933534849f94 *man/GPvam.benchmark.Rd
 f1a61d195577cceb8ddb4363c7fdb906 *man/VP.CP.ZP.un.Rd
-f021e86145464a1a45ac75050c35231d *man/bias.test.custom.Rd
+ac7e5e3115f96bc5482df7704d03a681 *man/bias.test.custom.Rd
 92e24ccf0dad3e46c33d9b533e3cada7 *man/plot.Rd
 c6969cd26f61c6880fa41876c0106afc *man/print.Rd
 f39f7108aae9c7c9fda55462dae402a0 *man/rGP.un.Rd

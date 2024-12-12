@@ -1,10 +1,9 @@
 bias.test.custom <- function(result, 
                              k_vectors = NULL, 
-                             n_perms = 1e5, 
-                             save_plots = FALSE, 
-                             output_folder = ".") {
+                             n_perms = 1e5
+                          ) {
   
-  # Ensure that the required components exist in the result object
+
   required_components <- c("X", "Z", "vinv", "eta.hat", "G", "num.teach", "persistence")
   missing_components <- setdiff(required_components, names(result))
   if(length(missing_components) > 0){
@@ -12,21 +11,21 @@ bias.test.custom <- function(result,
                paste(missing_components, collapse = ", ")))
   }
   
-  # Check persistence
+
   if(!(result$persistence %in% c("CP", "VP", "ZP"))){
     warning("The function is currently not enabled for persistence types other than 'CP', 'VP', or 'ZP'.")
   }
   
-  # Extract fixed effect names and count
+
   fixed_names <- colnames(result$X)
   n_fixed <- length(fixed_names)
   
-  # Validate k_vectors if provided
+
   if(!is.null(k_vectors)){
     if(!is.list(k_vectors)){
       k_vectors <- list(k_vectors)
     }
-    # Check each k vector
+  
     for(i in seq_along(k_vectors)){
       k <- k_vectors[[i]]
       if(!is.numeric(k)){
@@ -39,15 +38,12 @@ bias.test.custom <- function(result,
     }
   }
   
-  # Generate k_list and corresponding names
   if(is.null(k_vectors)){
-    # Generate standard basis vectors
     k_list <- lapply(1:n_fixed, function(j) {
       k <- rep(0, n_fixed)
       k[j] <- 1
       return(k)
     })
-    # Assign names as fixed effect names
     names(k_list) <- fixed_names
   } else {
     # Use custom k_vectors
@@ -89,12 +85,6 @@ bias.test.custom <- function(result,
   # Initialize a list to store plots
   plot_list <- list()
   
-  # Create output folder if saving plots
-  if(save_plots){
-    if(!dir.exists(output_folder)){
-      dir.create(output_folder, recursive = TRUE)
-    }
-  }
   
   # Identify indices for each variance component in G
   num_teach <- result$num.teach
@@ -108,7 +98,9 @@ bias.test.custom <- function(result,
   group_indices <- lapply(1:length(num_teach), function(i){
     (cum_teach[i] + 1):cum_teach[i + 1]
   })
-  
+  sym_mat <- symmpart(t(result$X) %*% result$vinv %*% result$X)
+  inv_sym_mat <- chol2inv(chol(sym_mat))
+  common_part <- inv_sym_mat %*% t(result$X) %*% result$vinv %*% result$Z
   # Loop over each k vector
   for(j in 1:n_tests){
     
@@ -116,8 +108,7 @@ bias.test.custom <- function(result,
     k <- k_list[[j]]
     
     # Compute nu
-    nu <- k %*% ginv(as.matrix(t(result$X) %*% result$vinv %*% result$X)) %*% 
-      t(result$X) %*% result$vinv %*% result$Z
+    nu <- k %*% common_part
     
     # Compute observed value
     observed.value <- as.numeric(nu %*% result$eta.hat)
@@ -168,13 +159,7 @@ bias.test.custom <- function(result,
     print(p)
     
     
-    # Save the plot if required
-    if(save_plots){
-      # Create a valid filename by replacing non-alphanumeric characters with underscores
-      filename <- paste0("permutation_test_", gsub("[^A-Za-z0-9]", "_", fe_name), ".png")
-      ggsave(filename, plot = p, path = output_folder, width = 8, height = 6)
-      cat("Saved plot for fixed effect:", fe_name, "as", file.path(output_folder, filename), "\n")
-    }
+
     
     # Store the plot in the list
     plot_list[[j]] <- p
@@ -197,14 +182,7 @@ bias.test.custom <- function(result,
     # Display the combined plot
     print(combined_plot)
     
-    # Save the combined plot if required
-    if(save_plots){
-      ggsave("combined_permutation_tests.png", combined_plot, 
-             path = output_folder, width = 4 * n_cols_combined, 
-             height = 4 * n_rows_combined)
-      cat("Saved combined permutation tests plot as", 
-          file.path(output_folder, "combined_permutation_tests.png"), "\n")
-    }
+
   }
   
   # Compile the results into a data frame
@@ -218,16 +196,10 @@ bias.test.custom <- function(result,
   # Arrange the columns
   permutation_results <- permutation_results[, c("Fixed_Effect", "Nu_Prime_Eta", "Permutation_P_Value")]
   
-  # Print the results data frame
+ 
   print(permutation_results)
   
-  # Save the results data frame if required
-  if(save_plots){
-    write.csv(permutation_results, file = file.path(output_folder, "permutation_test_results.csv"), 
-              row.names = FALSE)
-    cat("Saved permutation test results as", 
-        file.path(output_folder, "permutation_test_results.csv"), "\n")
-  }
+
   
   # Return the results and plots
   return(list(permutation_results = permutation_results, plot_list = plot_list))

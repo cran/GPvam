@@ -2,8 +2,8 @@ Package: GPvam
 Type: Package
 Title: Maximum Likelihood Estimation of Multiple Membership Mixed
         Models Used in Value-Added Modeling
-Version: 3.1-2
-Date: 2024-11-17
+Version: 3.2-0
+Date: 2024-12-05
 Authors@R: 
     c(person(given = c("Andrew"),
              family = "Karl",
@@ -27,10 +27,10 @@ ByteCompile: yes
 NeedsCompilation: yes
 LazyData: yes
 License: GPL-2
-Packaged: 2024-11-18 02:20:33 UTC; andre
+Packaged: 2024-12-12 09:54:48 UTC; andre
 Author: Andrew Karl [cre, aut] (<https://orcid.org/0000-0002-5933-8706>),
   Yan Yang [aut],
   Sharon Lohr [aut]
 Maintainer: Andrew Karl <akarl@asu.edu>
 Repository: CRAN
-Date/Publication: 2024-11-18 04:50:08 UTC
+Date/Publication: 2024-12-12 10:10:06 UTC
